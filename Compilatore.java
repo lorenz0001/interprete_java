@@ -2,16 +2,14 @@ import java.io.*;
 import javax.swing.JTextArea;
 
 public class Compilatore{
-    static String vocabolario = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-*/=!&;:()[]_<>\"";
+    static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-*/=!&;:()[]_<>\"";
     static String[] dizionario = {
           "if", "let", "while", "for", "if",
           "print", "stampa"
     };
-    static ListaVar variabili = new ListaVar();
-    static Lista errori = new Lista();
+    static ListaVar variabili;
     static JTextArea errArea;
     static String errString;
-    static boolean continua = true;
     public static boolean controlloSintattico(String s){
         boolean trovata = false;
         for(int j=0;j<dizionario.length;j++){
@@ -22,10 +20,10 @@ public class Compilatore{
         }
         return trovata;
     }
-    public static void ElevaErr(int riga, int colonna, String err) throws Exception{
-        throw new Exception("Errore: " + err + ", riga: " + riga + ", colonna: " + colonna);
+    public static void ElevaErr(int riga, int colonna, String err) throws Err{
+        throw new Err("Errore: " + err + ", riga: " + riga + ", colonna: " + colonna);
     }
-    public static void controlloErrori(String righe[]) throws Exception{
+    public static void controlloErrori(String righe[]) throws Err{
         for(int i=0;i<righe.length;i++){
             boolean inizioStringa = false;
             int inizio = 0;
@@ -37,7 +35,7 @@ public class Compilatore{
                     inizio=j;
                 }
                 if(!inizioStringa){
-                    if(vocabolario.indexOf(carattere) == -1){
+                    if(alfabeto.indexOf(carattere) == -1){
                         ElevaErr(i+1, j+1, "Carattere non riconosciuto: '" + carattere + "'");
                     }
                     if(j == 0 && !controlloSintattico(tokens[0])){
@@ -53,7 +51,6 @@ public class Compilatore{
         errArea.setText(e.getMessage());
     }
     public static String modifica(String s, char trova, char sostituisci){
-        //per ogni stringa dentro sostituisco lo spazio con un #
         StringBuilder str = new StringBuilder();
         boolean trovata = false;
         String temp = "";
@@ -72,29 +69,41 @@ public class Compilatore{
     public static void stampa(String s){
         System.out.println(s);
     }
+    public static String estraiCodice(String s) throws Err{
+        /*INIZIO
+         * 
+         * FINE*/
+        int inizio = s.indexOf("INIZIO") + "INIZIO".length();
+        int fine = s.indexOf("END");
+        return s.substring(inizio, fine);
+    }
     public static void compila(String s, JTextArea output, String testo){
+        variabili = new ListaVar();
         try{
             errArea = output;
             errString = testo;
+            //s = estraiCodice(s);
             String[] righe = s.split("\n");
             controlloErrori(righe);
             for(int i=0;i<righe.length;i++){
-                /*String temp = modifica(righe[i]);
-                stampa(temp);
-                String tokens[] = temp.split(" ");*/
                 String tokens[] = modifica(righe[i], ' ', '#').split(" ");
-                if(tokens[0].equals("let")){
-                    dichiara(tokens, i);
-                } else if(tokens[0].equals("stampa")){ // stampa (stringa || "ciao")
-                    String param = tokens[1].substring(1,tokens[1].length()-1);
-                    if(param.charAt(0) == '"'){
-                        param = modifica(param.substring(1,tokens[1].length()-1), '#', ' ');
-                    } else {
-                        System.out.println(modifica(cercaVar(param), '#', ' '));
-                    }
+                switch(tokens[0]){
+                    case "let":
+                        dichiara(tokens, i);
+                        break;
+                    case "stampa":
+                        // stampa ("ciao")
+                        String param = tokens[1].substring(1,tokens[1].length()-1);
+                        
+                        if(param.charAt(0) == '"'){
+                            System.out.println(param.substring(1,param.length()-1));
+                        } else {
+                            System.out.println(modifica(cercaVar(param), '#', ' '));
+                        }
+                        break;
                 }
             }
-        } catch(Exception e){
+        } catch(Err e){
             stampaError(e);
         }
     }
@@ -108,14 +117,16 @@ public class Compilatore{
         }
         return null;
     }
-    public static void dichiara(String[] tokens, int riga) throws Exception{
-    // let a = 1
+    public static void dichiara(String[] tokens, int riga) throws Err{
         if(tokens.length < 4){
             ElevaErr(riga+1, 0, "Dichiarazione non valida, lunghezza dichiarazione");
         } else if(!tokens[2].equals("=")){
             ElevaErr(riga+1, 0, "Dichiarazione non valida, manca l'uguale controlla meglio");
         }
         int tipo = controllaTipo(tokens[3]);
+        if(tipo == 3){
+            tokens[3] = tokens[3].substring(1,tokens[3].length()-1);
+        }
         variabili.push(new Variabile(tokens[1], tipo, tokens[3]));
     }
     public static int controllaTipo(String s){
