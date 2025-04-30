@@ -2,7 +2,7 @@ public class Variabile{
     String nome;
     int tipo;
     int val1;
-    float val2;
+    double val2;
     String val3;
     public Variabile next;
     Variabile(String n, int t, int val){
@@ -10,7 +10,7 @@ public class Variabile{
         tipo = t;
         val1 = val;
     }
-    Variabile(String n, int t, float val){
+    Variabile(String n, int t, double val){
         nome = n;
         tipo = t;
         val2 = val;

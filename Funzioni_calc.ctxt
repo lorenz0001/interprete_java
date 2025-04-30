@@ -1,0 +1,15 @@
+#BlueJ class context
+comment0.target=Funzioni_calc
+comment1.params=t
+comment1.target=boolean\ isNumero(java.lang.String)
+comment2.params=s
+comment2.target=double\ converti(java.lang.String)
+comment3.params=op2\ op1\ ope
+comment3.target=void\ gestisciOperatori(Op,\ Op,\ Op)
+comment4.params=op1\ op2
+comment4.target=int\ compara(Op,\ Op)
+comment5.params=espressione\ riga
+comment5.target=double\ main(java.lang.String,\ int)
+comment6.params=l\ operatori\ operandi\ riga
+comment6.target=double\ calcola(Lista,\ Stack,\ Stack,\ int)
+numComments=7

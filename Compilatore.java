@@ -9,15 +9,13 @@ public class Compilatore{
     static ListaVar variabili;
     static JTextArea errArea;
     static String errString;
-    public static boolean controlloSintattico(String s){
-        boolean trovata = false;
-        for(int j=0;j<dizionario.length;j++){
-            if(s.equals(dizionario[j])){
-                trovata = true;
-                break;
+    public static boolean controlloSintattico(String s, String[] diz){
+        for(int j=0;j<diz.length;j++){
+            if(s.equals(diz[j])){
+                return true;
             }
         }
-        return trovata;
+        return false;
     }
     public static void ElevaErr(int riga, int colonna, String err) throws Err{
         throw new Err("Errore: " + err + ", riga: " + riga + ", colonna: " + colonna);
@@ -37,7 +35,7 @@ public class Compilatore{
                     if(alfabeto.indexOf(carattere) == -1){
                         ElevaErr(i+1, j+1, "Carattere non riconosciuto: '" + carattere + "'");
                     }
-                    if(j == 0 && !controlloSintattico(tokens[0])){
+                    if(j == 0 && !controlloSintattico(tokens[0], dizionario)){
                         ElevaErr(i+1, j+1, "Token non riconosciuto: '" + tokens[0] + "'");
                     }
                 }
@@ -90,14 +88,14 @@ public class Compilatore{
                     case "let":
                         if(cercaVar(tokens[1]) != null)
                             ElevaErr(i+1, 0, "Variabile già dichiarata: " + tokens[1]);
-                        dichiara(tokens, i);
+                        dichiara(tokens, i, righe[i]);
                         break;
                     case "stampa":
                         String param = tokens[1].substring(1,tokens[1].length()-1);
                         if(param.charAt(0) == '"'){
                             System.out.println(param.substring(1,param.length()-1));
                         } else {
-                            String v = cercaVar(param);
+                            String v = converti(cercaVar(param));
                             if(v == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
                             System.out.println(modifica(v, '#', ' '));
@@ -109,30 +107,41 @@ public class Compilatore{
             stampaError(e);
         }
     }
-    public static String cercaVar(String s){
+    public static String converti(Variabile v){
+        switch(v.tipo){
+            case 1:
+                return ""+v.val1;
+            case 2:
+                return ""+v.val2;
+            case 3:
+                return v.val3;
+        }
+        return null;
+    }
+    public static Variabile cercaVar(String s){
         Variabile v = variabili.testa;
         while(v != null){
             if(v.nome.equals(s)){
-                return v.val3;
+                return v;
             }
             v = v.next;
         }
         return null;
     }
-    public static void dichiara(String[] tokens, int riga) throws Err{
+    public static void dichiara(String[] tokens, int riga, String r) throws Err{
         int tipo;
         if(tokens.length < 4){
             ElevaErr(riga+1, 0, "Dichiarazione non valida, lunghezza dichiarazione");
         } else if(!tokens[2].equals("=")){
             ElevaErr(riga+1, 0, "Dichiarazione non valida, manca l'uguale controlla meglio");
         }
-        if(tokens.length > 4){
-            
+        tokens[3] = r.substring(r.indexOf("=")+1, r.length()).trim();
+        tipo = controllaTipo(tokens[3]);
+        if(tipo == 3){
+            double risultato = Funzioni_calc.main(tokens[3], riga);
+            variabili.push(new Variabile(tokens[1], 2, risultato));
         } else {
-            tipo = controllaTipo(tokens[3]);
-            if(tipo == 3){
-                tokens[3] = tokens[3].substring(1,tokens[3].length()-1);
-            }
+            tokens[3] = tokens[3].substring(1,tokens[3].length()-1);
             variabili.push(new Variabile(tokens[1], tipo, tokens[3]));
         }
     }
@@ -142,7 +151,7 @@ public class Compilatore{
             return 1;
         }catch(Exception e){
             try{
-                Float.parseFloat(s);
+                Double.parseDouble(s);
                 return 2;
             } catch(Exception e2){
                 return 3;
