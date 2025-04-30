@@ -22,7 +22,7 @@ public class Compilatore{
         }
         return trovata;
     }
-    public static void StampaErr(int riga, int colonna, String err) throws Exception{
+    public static void ElevaErr(int riga, int colonna, String err) throws Exception{
         throw new Exception("Errore: " + err + ", riga: " + riga + ", colonna: " + colonna);
     }
     public static void controlloErrori(String righe[]) throws Exception{
@@ -38,14 +38,14 @@ public class Compilatore{
                 }
                 if(!inizioStringa){
                     if(vocabolario.indexOf(carattere) == -1){
-                        StampaErr(i+1, j+1, "Carattere non riconosciuto: '" + carattere + "'");
+                        ElevaErr(i+1, j+1, "Carattere non riconosciuto: '" + carattere + "'");
                     }
                     if(j == 0 && !controlloSintattico(tokens[0])){
-                        StampaErr(i+1, j+1, "Token non riconosciuto: '" + tokens[0] + "'");
+                        ElevaErr(i+1, j+1, "Token non riconosciuto: '" + tokens[0] + "'");
                     }
                 }
                 if(j == righe[i].length()-1 && inizioStringa)
-                    StampaErr(i+1, inizio+1, "Stringa non terminata");
+                    ElevaErr(i+1, inizio+1, "Stringa non terminata");
             }
         }
     }
@@ -108,14 +108,12 @@ public class Compilatore{
         }
         return null;
     }
-    public static void dichiara(String[] tokens, int riga){
+    public static void dichiara(String[] tokens, int riga) throws Exception{
     // let a = 1
         if(tokens.length < 4){
-            errori.push(new Nodo(riga+1, 0, "Dichiarazione non valida, lunghezza dichiarazione"));
-            return;
+            ElevaErr(riga+1, 0, "Dichiarazione non valida, lunghezza dichiarazione");
         } else if(!tokens[2].equals("=")){
-            errori.push(new Nodo(riga+1, 0, "Dichiarazione non valida, manca l'uguale controlla meglio"));
-            return;
+            ElevaErr(riga+1, 0, "Dichiarazione non valida, manca l'uguale controlla meglio");
         }
         int tipo = controllaTipo(tokens[3]);
         variabili.push(new Variabile(tokens[1], tipo, tokens[3]));
