@@ -11,6 +11,7 @@ public class Compilatore{
     static Lista errori = new Lista();
     static JTextArea errArea;
     static String errString;
+    static boolean continua = true;
     public static boolean controlloSintattico(String s){
         boolean trovata = false;
         for(int j=0;j<dizionario.length;j++){
@@ -21,7 +22,10 @@ public class Compilatore{
         }
         return trovata;
     }
-    public static boolean controlloErrori(String righe[]){
+    public static void StampaErr(int riga, int colonna, String err) throws Exception{
+        throw new Exception("Errore: " + err + ", riga: " + riga + ", colonna: " + colonna);
+    }
+    public static void controlloErrori(String righe[]) throws Exception{
         for(int i=0;i<righe.length;i++){
             boolean inizioStringa = false;
             int inizio = 0;
@@ -34,29 +38,19 @@ public class Compilatore{
                 }
                 if(!inizioStringa){
                     if(vocabolario.indexOf(carattere) == -1){
-                        errori.push(new Nodo(i+1, j+1, "Carattere non riconosciuto: '" + carattere + "'"));
+                        StampaErr(i+1, j+1, "Carattere non riconosciuto: '" + carattere + "'");
                     }
                     if(j == 0 && !controlloSintattico(tokens[0])){
-                        errori.push(new Nodo(i+1, j+1, "Token non riconosciuto: '" + tokens[0] + "'"));
+                        StampaErr(i+1, j+1, "Token non riconosciuto: '" + tokens[0] + "'");
                     }
                 }
                 if(j == righe[i].length()-1 && inizioStringa)
-                    errori.push(new Nodo(i+1, inizio+1, "Stringa non terminata"));
+                    StampaErr(i+1, inizio+1, "Stringa non terminata");
             }
         }
-        return true;
     }
-    public static void stampaErrori(){
-        boolean a = false;
-        Nodo n;
-        while((n = errori.pop()) != null){
-            errString += "Errore: " + n.err + ", riga: " + n.riga + " colonna: " + n.colonna + "\n";
-            errArea.setText(errString);
-            a = true;
-        }
-        
-        if(!a)
-            errArea.setText("Compilazione completata senza errori");
+    public static void stampaError(Exception e){
+        errArea.setText(e.getMessage());
     }
     public static String modifica(String s, char trova, char sostituisci){
         //per ogni stringa dentro sostituisco lo spazio con un #
@@ -79,27 +73,30 @@ public class Compilatore{
         System.out.println(s);
     }
     public static void compila(String s, JTextArea output, String testo){
-        errArea = output;
-        errString = testo;
-        String[] righe = s.split("\n");
-        controlloErrori(righe);
-        for(int i=0;i<righe.length;i++){
-            /*String temp = modifica(righe[i]);
-            stampa(temp);
-            String tokens[] = temp.split(" ");*/
-            String tokens[] = modifica(righe[i], ' ', '#').split(" ");
-            if(tokens[0].equals("let")){
-                dichiara(tokens, i);
-            } else if(tokens[0].equals("stampa")){ // stampa (stringa || "ciao")
-                String param = tokens[1].substring(1,tokens[1].length()-1);
-                if(param.charAt(0) == '"'){
-                    param = modifica(param.substring(1,tokens[1].length()-1), '#', ' ');
-                } else {
-                    System.out.println(modifica(cercaVar(param), '#', ' '));
+        try{
+            errArea = output;
+            errString = testo;
+            String[] righe = s.split("\n");
+            controlloErrori(righe);
+            for(int i=0;i<righe.length;i++){
+                /*String temp = modifica(righe[i]);
+                stampa(temp);
+                String tokens[] = temp.split(" ");*/
+                String tokens[] = modifica(righe[i], ' ', '#').split(" ");
+                if(tokens[0].equals("let")){
+                    dichiara(tokens, i);
+                } else if(tokens[0].equals("stampa")){ // stampa (stringa || "ciao")
+                    String param = tokens[1].substring(1,tokens[1].length()-1);
+                    if(param.charAt(0) == '"'){
+                        param = modifica(param.substring(1,tokens[1].length()-1), '#', ' ');
+                    } else {
+                        System.out.println(modifica(cercaVar(param), '#', ' '));
+                    }
                 }
             }
+        } catch(Exception e){
+            stampaError(e);
         }
-        stampaErrori();
     }
     public static String cercaVar(String s){
         Variabile v = variabili.testa;
