@@ -4,8 +4,7 @@ import javax.swing.JTextArea;
 public class Compilatore{
     static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-*/=!&;:()[]_<>\"";
     static String[] dizionario = {
-          "if", "let", "while", "for", "if",
-          "print", "stampa"
+          "if", "let", "while", "for", "if", "stampa"
     };
     static ListaVar variabili;
     static JTextArea errArea;
@@ -89,16 +88,19 @@ public class Compilatore{
                 String tokens[] = modifica(righe[i], ' ', '#').split(" ");
                 switch(tokens[0]){
                     case "let":
+                        if(cercaVar(tokens[1]) != null)
+                            ElevaErr(i+1, 0, "Variabile già dichiarata: " + tokens[1]);
                         dichiara(tokens, i);
                         break;
                     case "stampa":
-                        // stampa ("ciao")
                         String param = tokens[1].substring(1,tokens[1].length()-1);
-                        
                         if(param.charAt(0) == '"'){
                             System.out.println(param.substring(1,param.length()-1));
                         } else {
-                            System.out.println(modifica(cercaVar(param), '#', ' '));
+                            String v = cercaVar(param);
+                            if(v == null)
+                                ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
+                            System.out.println(modifica(v, '#', ' '));
                         }
                         break;
                 }
@@ -118,16 +120,21 @@ public class Compilatore{
         return null;
     }
     public static void dichiara(String[] tokens, int riga) throws Err{
+        int tipo;
         if(tokens.length < 4){
             ElevaErr(riga+1, 0, "Dichiarazione non valida, lunghezza dichiarazione");
         } else if(!tokens[2].equals("=")){
             ElevaErr(riga+1, 0, "Dichiarazione non valida, manca l'uguale controlla meglio");
         }
-        int tipo = controllaTipo(tokens[3]);
-        if(tipo == 3){
-            tokens[3] = tokens[3].substring(1,tokens[3].length()-1);
+        if(tokens.length > 4){
+            
+        } else {
+            tipo = controllaTipo(tokens[3]);
+            if(tipo == 3){
+                tokens[3] = tokens[3].substring(1,tokens[3].length()-1);
+            }
+            variabili.push(new Variabile(tokens[1], tipo, tokens[3]));
         }
-        variabili.push(new Variabile(tokens[1], tipo, tokens[3]));
     }
     public static int controllaTipo(String s){
         try{

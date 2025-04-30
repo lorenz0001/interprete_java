@@ -1,7 +1,0 @@
-#BlueJ class context
-comment0.target=Lista
-comment1.params=n
-comment1.target=void\ push(Nodo)
-comment2.params=
-comment2.target=Nodo\ pop()
-numComments=3
