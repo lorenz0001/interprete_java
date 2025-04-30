@@ -108,6 +108,8 @@ public class Compilatore{
         }
     }
     public static String converti(Variabile v){
+        if(v == null)
+            return null;
         switch(v.tipo){
             case 1:
                 return ""+v.val1;
@@ -137,12 +139,17 @@ public class Compilatore{
         }
         tokens[3] = r.substring(r.indexOf("=")+1, r.length()).trim();
         tipo = controllaTipo(tokens[3]);
-        if(tipo == 3){
-            double risultato = Funzioni_calc.main(tokens[3], riga);
-            variabili.push(new Variabile(tokens[1], 2, risultato));
-        } else {
-            tokens[3] = tokens[3].substring(1,tokens[3].length()-1);
-            variabili.push(new Variabile(tokens[1], tipo, tokens[3]));
+        switch(tipo){
+            case 1:
+                variabili.push(new Variabile(tokens[1], tipo, Integer.parseInt(tokens[3])));
+                break;
+            case 2:
+                variabili.push(new Variabile(tokens[1], tipo, Float.parseFloat(tokens[3])));
+                break;
+            case 3:
+                double risultato = Funzioni_calc.main(tokens[3], riga);
+                variabili.push(new Variabile(tokens[1], 2, risultato));
+                break;
         }
     }
     public static int controllaTipo(String s){

@@ -33,7 +33,7 @@ public class App {
         }
     }
 
-    public static void main(){
+    public static void main(String args[]){
         app("","");
     }
     
