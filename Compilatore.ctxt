@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=Compilatore
+comment1.params=s
+comment1.target=boolean\ controlloSintattico(java.lang.String)
+comment2.params=righe
+comment2.target=boolean\ controlloErrori(java.lang.String[])
+comment3.params=
+comment3.target=void\ stampaErrori()
+comment4.params=s\ trova\ sostituisci
+comment4.target=java.lang.String\ modifica(java.lang.String,\ char,\ char)
+comment5.params=s
+comment5.target=void\ stampa(java.lang.String)
+comment6.params=s\ output\ testo
+comment6.target=void\ compila(java.lang.String,\ javax.swing.JTextArea,\ java.lang.String)
+comment7.params=s
+comment7.target=java.lang.String\ cercaVar(java.lang.String)
+comment8.params=tokens\ riga
+comment8.target=void\ dichiara(java.lang.String[],\ int)
+comment9.params=s
+comment9.target=int\ controllaTipo(java.lang.String)
+numComments=10

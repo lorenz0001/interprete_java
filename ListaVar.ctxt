@@ -1,0 +1,7 @@
+#BlueJ class context
+comment0.target=ListaVar
+comment1.params=n
+comment1.target=void\ push(Variabile)
+comment2.params=
+comment2.target=Variabile\ pop()
+numComments=3

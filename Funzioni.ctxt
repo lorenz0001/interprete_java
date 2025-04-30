@@ -1,0 +1,15 @@
+#BlueJ class context
+comment0.target=Funzioni
+comment1.params=nomeFile\ mail
+comment1.target=boolean\ checkEsiste(java.lang.String,\ java.lang.String)
+comment2.params=nomeFile\ mail\ password\ frame
+comment2.target=void\ registra(java.lang.String,\ java.lang.String,\ java.lang.String,\ javax.swing.JFrame)
+comment3.params=nomeFile\ mail\ password\ frame
+comment3.target=boolean\ login(java.lang.String,\ java.lang.String,\ java.lang.String,\ javax.swing.JFrame)
+comment4.params=mail
+comment4.target=boolean\ checkMail(java.lang.String)
+comment5.params=password
+comment5.target=boolean\ checkPass(java.lang.String)
+comment6.params=nomeFile\ mail
+comment6.target=java.lang.String\ recupera(java.lang.String,\ java.lang.String)
+numComments=7

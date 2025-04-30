@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=CreaFinestra
+comment1.params=messaggio
+comment1.target=void\ crea(java.lang.String)
+comment2.params=mail\ f
+comment2.target=void\ recuperaPassword(java.lang.String,\ java.awt.Frame)
+comment3.params=
+comment3.target=void\ compilatore()
+numComments=4
