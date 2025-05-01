@@ -2,7 +2,7 @@ import java.io.*;
 import javax.swing.JTextArea;
 
 public class Compilatore{
-    static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-*/=!&;:()[]_<>\"";
+    static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>\"";
     static String[] dizionario = {
           "if", "let", "while", "for", "if", "stampa"
     };
