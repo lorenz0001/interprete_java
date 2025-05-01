@@ -8,7 +8,8 @@ public class Compilatore{
     };
     static ListaVar variabili;
     static JTextArea errArea;
-    static String errString;
+    static JTextArea outArea;
+    static String outString;
     public static boolean controlloSintattico(String s, String[] diz){
         for(int j=0;j<diz.length;j++){
             if(s.equals(diz[j])){
@@ -47,6 +48,10 @@ public class Compilatore{
     public static void stampaError(Exception e){
         errArea.setText(e.getMessage());
     }
+    public static void stampaOut(String s){
+        outString+="\n"+s;
+        outArea.setText(outString);
+    }
     public static String modifica(String s, char trova, char sostituisci){
         StringBuilder str = new StringBuilder();
         boolean trovata = false;
@@ -74,11 +79,12 @@ public class Compilatore{
         int fine = s.indexOf("END");
         return s.substring(inizio, fine);
     }
-    public static void compila(String s, JTextArea output, String testo){
+    public static void compila(String s, JTextArea errAreas, JTextArea outAreas, String outStrings){
         variabili = new ListaVar();
         try{
-            errArea = output;
-            errString = testo;
+            errArea = errAreas;
+            outArea = outAreas;
+            outString = outStrings;
             String[] righe = s.replace("\n","").split(";");
             controlloErrori(righe);
             for(int i=0;i<righe.length;i++){
@@ -92,12 +98,12 @@ public class Compilatore{
                     case "stampa":
                         String param = tokens[1].substring(1,tokens[1].length()-1);
                         if(param.charAt(0) == '"'){
-                            System.out.println(param.substring(1,param.length()-1));
+                            stampaOut(param.substring(1,param.length()-1));
                         } else {
                             String v = converti(cercaVar(param));
                             if(v == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
-                            System.out.println(modifica(v, '#', ' '));
+                            stampaOut(modifica(v, '#', ' '));
                         }
                         break;
                     case "if":
