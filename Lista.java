@@ -7,7 +7,8 @@ public class Lista {
                 c.equals(".") ||
                 Funzioni_calc.isNumero(c) && (coda.s.charAt(coda.s.length() - 1) == '.' ||
                 Funzioni_calc.isNumero(coda.s) ||
-                (coda.s.equals("-") && (coda.prec == coda || coda.prec.s.equals("("))))
+                (coda.s.equals("-") && (coda.prec == coda || coda.prec.s.equals("(")))) ||
+                !Compilatore.controlloSintattico(c, Funzioni_calc.oper)
             )) {
             coda.s += c;    
         } else {

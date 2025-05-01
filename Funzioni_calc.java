@@ -78,7 +78,7 @@ public static void gestisciOperatori(Op op2, Op op1, Op ope) {
             if (corrente == null) {
                 break;
             }
-            
+            System.out.println(corrente.s + "operatore");
             if(!Compilatore.controlloSintattico(corrente.s, oper) && !isNumero(corrente.s)){
                 Variabile v = Compilatore.cercaVar(corrente.s);
                 if(v == null){

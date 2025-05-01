@@ -79,8 +79,7 @@ public class Compilatore{
         try{
             errArea = output;
             errString = testo;
-            //s = estraiCodice(s);
-            String[] righe = s.split("\n");
+            String[] righe = s.replace("\n","").split(";");
             controlloErrori(righe);
             for(int i=0;i<righe.length;i++){
                 String tokens[] = modifica(righe[i], ' ', '#').split(" ");
@@ -100,6 +99,8 @@ public class Compilatore{
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
                             System.out.println(modifica(v, '#', ' '));
                         }
+                        break;
+                    case "if":
                         break;
                 }
             }
