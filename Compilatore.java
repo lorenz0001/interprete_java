@@ -4,7 +4,7 @@ import javax.swing.JTextArea;
 public class Compilatore{
     static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>\""+'\t';
     static String[] dizionario = {
-          "if", "let", "while", "for", "if", "stampa"
+          "if", "let", "while", "for", "if", "print"
     };
     static ListaVar variabili;
     static JTextArea errArea;
@@ -45,10 +45,10 @@ public class Compilatore{
             }
         }
     }
-    public static void stampaError(Exception e){
+    public static void printError(Exception e){
         errArea.setText(e.getMessage());
     }
-    public static void stampaOut(String s){
+    public static void printOut(String s){
         outString+="\n"+s;
         outArea.setText(outString);
     }
@@ -115,15 +115,15 @@ public class Compilatore{
                             ElevaErr(i+1, 0, "Variabile già dichiarata: " + tokens[1]);
                         dichiara(tokens, i, righe[i]);
                         break;
-                    case "stampa":
-                        String param = tokens[1].substring(1,tokens[1].length()-1);
+                    case "print":
+                        String param = tokens[1];//.substring(1,tokens[1].length()-1);
                         if(param.charAt(0) == '"'){
-                            stampaOut(param.substring(1,param.length()-1));
+                            printOut(param.substring(1,param.length()-1));
                         } else {
                             String v = converti(cercaVar(param));
                             if(v == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
-                            stampaOut(modifica(v, '#', ' '));
+                            printOut(modifica(v, '#', ' '));
                         }
                         break;
                     case "if":
@@ -131,7 +131,7 @@ public class Compilatore{
                 }
             }
         } catch(Err e){
-            stampaError(e);
+            printError(e);
         }
     }
     public static String converti(Variabile v){
