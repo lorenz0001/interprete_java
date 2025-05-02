@@ -2,7 +2,7 @@ import java.io.*;
 import javax.swing.JTextArea;
 
 public class Compilatore{
-    static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>\"";
+    static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>\""+'\t';
     static String[] dizionario = {
           "if", "let", "while", "for", "if", "stampa"
     };
@@ -27,7 +27,7 @@ public class Compilatore{
             int inizio = 0;
             for(int j=0;j<righe[i].length();j++){
                 char carattere = righe[i].charAt(j);
-                String tokens[] = righe[i].split(" ");
+                String tokens[] = righe[i].trim().split(" ");
                 if(carattere == '"'){
                     inizioStringa = !inizioStringa;
                     inizio=j;
@@ -68,9 +68,6 @@ public class Compilatore{
         }
         return str.toString();
     }
-    public static void stampa(String s){
-        System.out.println(s);
-    }
     public static String estraiCodice(String s) throws Err{
         /*INIZIO
          * 
@@ -78,6 +75,28 @@ public class Compilatore{
         int inizio = s.indexOf("INIZIO") + "INIZIO".length();
         int fine = s.indexOf("END");
         return s.substring(inizio, fine);
+    }
+    public static int getLivello(String s){
+        /*int z = 0;
+        int j = 0;
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i) == ' '){
+                j+=1;
+            }else
+                return z;
+            if(j == 8){
+                j = 0;
+                z += 1;
+            }
+        }*/
+        int z = 0;
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i) == '\t')
+                z+=1;
+            else
+                return z;
+        }
+        return z;
     }
     public static void compila(String s, JTextArea errAreas, JTextArea outAreas, String outStrings){
         variabili = new ListaVar();
@@ -88,6 +107,7 @@ public class Compilatore{
             String[] righe = s.replace("\n","").split(";");
             controlloErrori(righe);
             for(int i=0;i<righe.length;i++){
+                System.out.println("livello: " + getLivello(righe[i]));
                 String tokens[] = modifica(righe[i], ' ', '#').split(" ");
                 switch(tokens[0]){
                     case "let":
