@@ -2,9 +2,9 @@ import java.io.*;
 import javax.swing.JTextArea;
 
 public class Compilatore{
-    static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>\""+'\t';
+    static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>"+'\t'+'"';
     static String[] dizionario = {
-          "if", "let", "while", "for", "if", "print"
+          "if", "let", "while", "for", "print"
     };
     static ListaVar variabili;
     static JTextArea errArea;
@@ -126,7 +126,8 @@ public class Compilatore{
                             printOut(modifica(v, '#', ' '));
                         }
                         break;
-                    case "if":
+                    case "if": // if a > b
+                        
                         break;
                 }
             }
@@ -174,8 +175,12 @@ public class Compilatore{
                 variabili.push(new Variabile(tokens[1], tipo, Float.parseFloat(tokens[3])));
                 break;
             case 3:
-                double risultato = Funzioni_calc.main(tokens[3], riga);
-                variabili.push(new Variabile(tokens[1], 2, risultato));
+                if(tokens[3].charAt(0) == '"' && tokens[3].charAt(tokens[3].length()-1) == '"'){
+                    variabili.push(new Variabile(tokens[1], tipo, tokens[3]));
+                } else {
+                    double risultato = Funzioni_calc.main(tokens[3], riga);
+                    variabili.push(new Variabile(tokens[1], 2, risultato));
+                }            
                 break;
         }
     }
