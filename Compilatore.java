@@ -10,6 +10,7 @@ public class Compilatore{
     static JTextArea errArea;
     static JTextArea outArea;
     static String outString;
+    static Variabile v;
     public static boolean controlloSintattico(String s, String[] diz){
         for(int j=0;j<diz.length;j++){
             if(s.equals(diz[j])){
@@ -68,7 +69,7 @@ public class Compilatore{
         }
         return str.toString();
     }
-    public static String estraiCodice(String s) throws Err{
+    public static String getCodice(String s) throws Err{
         /*INIZIO
          * 
          * FINE*/
@@ -111,7 +112,7 @@ public class Compilatore{
                 String tokens[] = modifica(righe[i], ' ', '#').split(" ");
                 switch(tokens[0]){
                     case "let":
-                        if(cercaVar(tokens[1]) != null)
+                        if(getVar(tokens[1]) != null)
                             ElevaErr(i+1, 0, "Variabile già dichiarata: " + tokens[1]);
                         dichiara(tokens, i, righe[i]);
                         break;
@@ -120,13 +121,19 @@ public class Compilatore{
                         if(param.charAt(0) == '"'){
                             printOut(param.substring(1,param.length()-1));
                         } else {
-                            String v = converti(cercaVar(param));
+                            String v = converti(getVar(param));
                             if(v == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
                             printOut(modifica(v, '#', ' '));
                         }
                         break;
                     case "if": // if a > b
+                        Variabile v1, v2;
+                        v1 = creaVar(tokens[1]);
+                        v2 = creaVar(tokens[3]);
+                        String ope = tokens[2];
+                        
+                        
                         
                         break;
                 }
@@ -148,8 +155,23 @@ public class Compilatore{
         }
         return null;
     }
-    public static Variabile cercaVar(String s){
-        Variabile v = variabili.testa;
+    static Variabile creaVar(String s){
+        if((v = getVar(s)) == null){
+            int tipo = getTipo(s);
+            switch(tipo){
+                case 1:
+                    return new Variabile("",tipo,Integer.parseInt(s));
+                case 2:
+                    return new Variabile("",tipo,Float.parseFloat(s));
+                case 3:
+                    return new Variabile("",tipo,s);
+            }
+        }else
+            return v;
+        return null;
+    }
+    public static Variabile getVar(String s){
+        v = variabili.testa;
         while(v != null){
             if(v.nome.equals(s)){
                 return v;
@@ -158,6 +180,7 @@ public class Compilatore{
         }
         return null;
     }
+    
     public static void dichiara(String[] tokens, int riga, String r) throws Err{
         int tipo;
         if(tokens.length < 4){
@@ -166,7 +189,7 @@ public class Compilatore{
             ElevaErr(riga+1, 0, "Dichiarazione non valida, manca l'uguale controlla meglio");
         }
         tokens[3] = r.substring(r.indexOf("=")+1, r.length()).trim();
-        tipo = controllaTipo(tokens[3]);
+        tipo = getTipo(tokens[3]);
         switch(tipo){
             case 1:
                 variabili.push(new Variabile(tokens[1], tipo, Integer.parseInt(tokens[3])));
@@ -184,7 +207,7 @@ public class Compilatore{
                 break;
         }
     }
-    public static int controllaTipo(String s){
+    public static int getTipo(String s){
         try{
             Integer.parseInt(s);
             return 1;

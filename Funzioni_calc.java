@@ -79,7 +79,7 @@ public static void gestisciOperatori(Op op2, Op op1, Op ope) {
                 break;
             }
             if(!Compilatore.controlloSintattico(corrente.s, oper) && !isNumero(corrente.s)){
-                Variabile v = Compilatore.cercaVar(corrente.s);
+                Variabile v = Compilatore.getVar(corrente.s);
                 if(v == null){
                     Compilatore.ElevaErr(riga,0,"Variabile: " + corrente.s + " non dichiarata");
                 }
