@@ -4,13 +4,14 @@ import javax.swing.JTextArea;
 public class Compilatore{
     static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>"+'\t'+'"';
     static String[] dizionario = {
-          "if", "let", "while", "for", "print"
+          "if", "let", "while", "for", "print", "else"
     };
     static ListaVar variabili;
     static JTextArea errArea;
     static JTextArea outArea;
     static String outString;
     static Variabile v;
+    static Stack condizioni;
     public static boolean controlloSintattico(String s, String[] diz){
         for(int j=0;j<diz.length;j++){
             if(s.equals(diz[j])){
@@ -101,6 +102,10 @@ public class Compilatore{
     }
     public static void compila(String s, JTextArea errAreas, JTextArea outAreas, String outStrings){
         variabili = new ListaVar();
+        int livello_corrente = 0;
+        int livello;
+        condizioni = new Stack();
+        Op preso;
         try{
             errArea = errAreas;
             outArea = outAreas;
@@ -108,8 +113,14 @@ public class Compilatore{
             String[] righe = s.replace("\n","").split(";");
             controlloErrori(righe);
             for(int i=0;i<righe.length;i++){
+                livello = getLivello(righe[i]);
                 System.out.println("livello: " + getLivello(righe[i]));
-                String tokens[] = modifica(righe[i], ' ', '#').split(" ");
+                System.out.println("Livello corrente: " + livello_corrente);
+                if(livello_corrente != livello){
+                    while(getLivello(righe[i]) != livello_corrente && i < righe.length)
+                        i+=1;
+                }
+                String tokens[] = modifica(righe[i].trim(), ' ', '#').split(" ");
                 switch(tokens[0]){
                     case "let":
                         if(getVar(tokens[1]) != null)
@@ -127,20 +138,76 @@ public class Compilatore{
                             printOut(modifica(v, '#', ' '));
                         }
                         break;
+                    case "else":
+                        ElevaErr(i+1, 0, "Else non previsto");
+                        break;
                     case "if": // if a > b
                         Variabile v1, v2;
                         v1 = creaVar(tokens[1]);
                         v2 = creaVar(tokens[3]);
+                        System.out.println("v2 " + tokens[3]);
                         String ope = tokens[2];
+                        System.out.println("tipo1: "+ v1.tipo + ", tipo2: " + v2.tipo);
+                        if(v1.tipo != v2.tipo)
+                            ElevaErr(i+1, 0, "I tipi dei dati da confrontare devono essere gli stessi");
                         
+                        switch(ope){
+                            case ">":
+                            case "<":
+                            case ">=":
+                            case "<=":
+                                if(v1.tipo == 3)
+                                    ElevaErr(i+1, 0, "Una stringa non può accettare questo operatore nel confronto");
+                                break;
+                        }
+                        switch(ope){
+                            case ">":
+                                if(getNumero(v1) > getNumero(v2))
+                                    livello_corrente+=1;
+                                break;
+                            case "<":
+                                if(getNumero(v1) < getNumero(v2))
+                                    livello_corrente+=1;
+                                break;
+                            case ">=":
+                                if(getNumero(v1) >= getNumero(v2))
+                                    livello_corrente+=1;
+                                break;
+                            case "<=":
+                                if(getNumero(v1) <= getNumero(v2))
+                                    livello_corrente+=1;
+                                break;
+                            case "==":
+                                if(getNumero(v1) == getNumero(v2))
+                                    livello_corrente+=1;
+                                break;
+                            case "!=":
+                                if(getNumero(v1) != getNumero(v2))
+                                    livello_corrente+=1;
+                                break;
+                        }
                         
+                        if(livello_corrente == livello){
+                            while(getLivello(righe[i]) != livello_corrente && i < righe.length)
+                                i+=1;
+                        }
                         
+                        tokens = modifica(righe[i], ' ', '#').split(" ");
+                        if(tokens[0].equals("else")){
+                            livello_corrente+=1;
+                        }
                         break;
                 }
             }
         } catch(Err e){
             printError(e);
         }
+    }
+    public static double getNumero(Variabile v){
+        if(v.tipo == 1)
+            return Double.parseDouble(Integer.toString(v.val1));
+        else
+            return v.val2;
     }
     public static String converti(Variabile v){
         if(v == null)
