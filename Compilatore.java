@@ -116,10 +116,10 @@ public class Compilatore{
                 livello = getLivello(righe[i]);
                 System.out.println("livello: " + getLivello(righe[i]));
                 System.out.println("Livello corrente: " + livello_corrente);
-                if(livello_corrente != livello){
+                /*if(livello_corrente != livello){
                     while(getLivello(righe[i]) != livello_corrente && i < righe.length)
                         i+=1;
-                }
+                }*/
                 String tokens[] = modifica(righe[i].trim(), ' ', '#').split(" ");
                 switch(tokens[0]){
                     case "let":
@@ -188,11 +188,13 @@ public class Compilatore{
                         }
                         
                         if(livello_corrente == livello){
+                            i+=1;
                             while(getLivello(righe[i]) != livello_corrente && i < righe.length)
                                 i+=1;
                         }
                         
                         tokens = modifica(righe[i], ' ', '#').split(" ");
+                        System.out.println("token: " + tokens[0]);
                         if(tokens[0].equals("else")){
                             livello_corrente+=1;
                         }
