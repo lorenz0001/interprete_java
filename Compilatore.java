@@ -103,6 +103,7 @@ public class Compilatore{
     public static void compila(String s, JTextArea errAreas, JTextArea outAreas, String outStrings){
         variabili = new ListaVar();
         int livello_corrente = 0;
+        Variabile v;
         int livello;
         condizioni = new Stack();
         Op preso;
@@ -111,7 +112,7 @@ public class Compilatore{
             outArea = outAreas;
             outString = outStrings;
             String[] righe = s.replace("\n","").split(";");
-            controlloErrori(righe);
+            //controlloErrori(righe);
             for(int i=0;i<righe.length;i++){
                 livello = getLivello(righe[i]);
                 System.out.println("livello: " + getLivello(righe[i]));
@@ -125,17 +126,21 @@ public class Compilatore{
                     case "let":
                         if(getVar(tokens[1]) != null)
                             ElevaErr(i+1, 0, "Variabile già dichiarata: " + tokens[1]);
-                        dichiara(tokens, i, righe[i]);
+                        dichiara(tokens, i, righe[i], 0);
+                        String[] nuovoDizionario = new String[dizionario.length + 1];
+                        System.arraycopy(dizionario, 0, nuovoDizionario, 0, dizionario.length);
+                        nuovoDizionario[dizionario.length] = tokens[1];
+                        dizionario = nuovoDizionario;
                         break;
                     case "print":
                         String param = tokens[1];//.substring(1,tokens[1].length()-1);
                         if(param.charAt(0) == '"'){
                             printOut(param.substring(1,param.length()-1));
                         } else {
-                            String v = converti(getVar(param));
-                            if(v == null)
+                            String str = converti(getVar(param));
+                            if(str == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
-                            printOut(modifica(v, '#', ' '));
+                            printOut(modifica(str, '#', ' '));
                         }
                         break;
                     case "else":
@@ -189,15 +194,23 @@ public class Compilatore{
                         
                         if(livello_corrente == livello){
                             i+=1;
-                            while(getLivello(righe[i]) != livello_corrente && i < righe.length)
+                            while(i < righe.length && getLivello(righe[i]) != livello_corrente)
                                 i+=1;
                         }
-                        
-                        tokens = modifica(righe[i], ' ', '#').split(" ");
-                        System.out.println("token: " + tokens[0]);
-                        if(tokens[0].equals("else")){
-                            livello_corrente+=1;
+                        if (i < righe.length){
+                             tokens = modifica(righe[i], ' ', '#').split(" ");
+                            System.out.println("token: " + tokens[0]);
+                            if(tokens[0].equals("else")){
+                                livello_corrente+=1;
+                            }
                         }
+                       
+                        break;
+                    default:
+                        if((v = getVar(tokens[0])) != null){
+                            dichiara(tokens, i, righe[i], 1);
+                        } else
+                            ElevaErr(i+1,0,"token non riconosciuto");
                         break;
                 }
             }
@@ -225,6 +238,7 @@ public class Compilatore{
         return null;
     }
     static Variabile creaVar(String s){
+        Variabile v;
         if((v = getVar(s)) == null){
             int tipo = getTipo(s);
             switch(tipo){
@@ -240,7 +254,7 @@ public class Compilatore{
         return null;
     }
     public static Variabile getVar(String s){
-        v = variabili.testa;
+        Variabile v = variabili.testa;
         while(v != null){
             if(v.nome.equals(s)){
                 return v;
@@ -250,28 +264,62 @@ public class Compilatore{
         return null;
     }
     
-    public static void dichiara(String[] tokens, int riga, String r) throws Err{
+    public static void modificaVar(Variabile s, Variabile d) {
+    Variabile v = variabili.testa;
+
+    if (v == s) {
+        d.next = s.next; // collega il nuovo nodo
+        variabili.testa = d;
+        return;
+    }
+
+    while (v != null && v.next != null) {
+        if (v.next == s) {
+            d.next = s.next; // collega il nuovo nodo
+            v.next = d;
+            break;
+        }
+        v = v.next;
+    }
+}
+
+    
+    public static void dichiara(String[] tokens, int riga, String r, int q) throws Err{
         int tipo;
-        if(tokens.length < 4){
+        if(tokens.length < 4-q){
             ElevaErr(riga+1, 0, "Dichiarazione non valida, lunghezza dichiarazione");
-        } else if(!tokens[2].equals("=")){
+        } else if(!tokens[2-q].equals("=")){
             ElevaErr(riga+1, 0, "Dichiarazione non valida, manca l'uguale controlla meglio");
         }
-        tokens[3] = r.substring(r.indexOf("=")+1, r.length()).trim();
-        tipo = getTipo(tokens[3]);
+        tokens[3-q] = r.substring(r.indexOf("=")+1, r.length()).trim();
+        tipo = getTipo(tokens[3-q]);
         switch(tipo){
             case 1:
-                variabili.push(new Variabile(tokens[1], tipo, Integer.parseInt(tokens[3])));
+                if(q == 0)
+                    variabili.push(new Variabile(tokens[1-q], tipo, Integer.parseInt(tokens[3])));
+                else
+                    modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo,  Integer.parseInt(tokens[3-q])));
                 break;
             case 2:
-                variabili.push(new Variabile(tokens[1], tipo, Float.parseFloat(tokens[3])));
+                if(q == 0)
+                    variabili.push(new Variabile(tokens[1-q], tipo, Float.parseFloat(tokens[3])));
+                else
+                    modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo,  Float.parseFloat(tokens[3-q])));
                 break;
             case 3:
-                if(tokens[3].charAt(0) == '"' && tokens[3].charAt(tokens[3].length()-1) == '"'){
-                    variabili.push(new Variabile(tokens[1], tipo, tokens[3]));
+                if(tokens[3].charAt(0) == '"' && tokens[3-q].charAt(tokens[3-q].length()-1) == '"'){
+                    if(q == 0)
+                        variabili.push(new Variabile(tokens[1-q], tipo, tokens[3-q]));
+                    else
+                        modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo, tokens[3-q]));
                 } else {
-                    double risultato = Funzioni_calc.main(tokens[3], riga);
-                    variabili.push(new Variabile(tokens[1], 2, risultato));
+                    double risultato = Funzioni_calc.main(tokens[3-q], riga);
+                    if(q == 0){
+                        variabili.push(new Variabile(tokens[1-q], 2, risultato));
+                    } else{
+                        modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], 2, risultato));
+                        
+                    }
                 }            
                 break;
         }
