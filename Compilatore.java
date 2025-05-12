@@ -295,9 +295,10 @@ public class Compilatore{
         tipo = getTipo(tokens[3-q]);
         switch(tipo){
             case 1:
-                if(q == 0)
+                if(q == 0){
                     variabili.push(new Variabile(tokens[1-q], tipo, Integer.parseInt(tokens[3])));
-                else
+                    System.out.println("ciao");
+                }else
                     modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo,  Integer.parseInt(tokens[3-q])));
                 break;
             case 2:
@@ -307,7 +308,7 @@ public class Compilatore{
                     modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo,  Float.parseFloat(tokens[3-q])));
                 break;
             case 3:
-                if(tokens[3].charAt(0) == '"' && tokens[3-q].charAt(tokens[3-q].length()-1) == '"'){
+                if(tokens[3-q].charAt(0) == '"' && tokens[3-q].charAt(tokens[3-q].length()-1) == '"'){
                     if(q == 0)
                         variabili.push(new Variabile(tokens[1-q], tipo, tokens[3-q]));
                     else
