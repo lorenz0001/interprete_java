@@ -115,8 +115,8 @@ public class Compilatore{
             //controlloErrori(righe);
             for(int i=0;i<righe.length;i++){
                 livello = getLivello(righe[i]);
-                System.out.println("livello: " + getLivello(righe[i]));
-                System.out.println("Livello corrente: " + livello_corrente);
+                //System.out.println("livello: " + getLivello(righe[i]));
+                //System.out.println("Livello corrente: " + livello_corrente);
                 /*if(livello_corrente != livello){
                     while(getLivello(righe[i]) != livello_corrente && i < righe.length)
                         i+=1;
@@ -192,18 +192,29 @@ public class Compilatore{
                                 break;
                         }
                         
-                        if(livello_corrente == livello){
+                        if(livello_corrente == livello){ //condizione falsa
                             i+=1;
-                            while(i < righe.length && getLivello(righe[i]) != livello_corrente)
+                            livello = getLivello(righe[i]);
+                            while(i < righe.length && livello != livello_corrente){
+                                System.out.println("livello corrente: " + livello_corrente + ",livello: " + livello);
+                                if(livello < livello_corrente)
+                                    livello_corrente-=1;
+                                System.out.println("asinasd");
                                 i+=1;
+                                
+                                if(i < righe.length){
+                                    livello = getLivello(righe[i]);
+                                }
+                            }
                         }
-                        if (i < righe.length){
+                        
+                        /*if (i < righe.length){
                              tokens = modifica(righe[i], ' ', '#').split(" ");
                             System.out.println("token: " + tokens[0]);
                             if(tokens[0].equals("else")){
                                 livello_corrente+=1;
                             }
-                        }
+                        }*/
                        
                         break;
                     default:
