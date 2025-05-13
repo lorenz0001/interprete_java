@@ -100,19 +100,62 @@ public class Compilatore{
         }
         return z;
     }
+    public static void trasformaElse(String[] righe){
+        condizioni = new Stack();
+        Op preso;
+        int z;
+        int l;
+        for(int i=0;i<righe.length;i++){
+            z = i;
+            String tokens[] = modifica(righe[i].trim(), ' ', '#').split(" ");
+            if(tokens[0].equals("if")){
+                l = getLivello(righe[i]);
+                z+=1;
+                while(z < righe.length && getLivello(righe[z]) != l)
+                    z+=1;
+                if(z != righe.length && righe[z].equals("else")){
+                    
+                    String op = tokens[2];
+                    switch(op){
+                        case "<":
+                            op = ">=";
+                            break;
+                        case ">":
+                            op = "<=";
+                            break;
+                        case ">=":
+                            op = "<";
+                            break;
+                        case "<=":
+                            op = ">";
+                            break;
+                        case "==":
+                            op = "!=";
+                            break;
+                        case "!=":
+                            op = "==";
+                            break;
+                    }
+                    String nuovoIf = "if "+tokens[1]+" "+op+" "+tokens[3];
+                    righe[z] = nuovoIf;
+                }
+            }
+        }
+    }
     public static void compila(String s, JTextArea errAreas, JTextArea outAreas, String outStrings){
         variabili = new ListaVar();
         int livello_corrente = 0;
         Variabile v;
         int livello;
-        condizioni = new Stack();
-        Op preso;
+        
         try{
             errArea = errAreas;
             outArea = outAreas;
             outString = outStrings;
             String[] righe = s.replace("\n","").split(";");
             //controlloErrori(righe);
+            trasformaElse(righe);
+            ElevaErr(0,0,String.join("\n", righe));
             for(int i=0;i<righe.length;i++){
                 livello = getLivello(righe[i]);
                 //System.out.println("livello: " + getLivello(righe[i]));
