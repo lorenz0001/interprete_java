@@ -2,45 +2,75 @@ import java.io.*;
 import javax.swing.*;
 
 public class Funzioni{
-    public static void trasformaElse(String[] righe){
-        int z;
-        int l;
-        for(int i=0;i<righe.length;i++){
-            z = i;
-            String tokens[] = modifica(righe[i].trim(), ' ', '#').split(" ");
-            if(tokens[0].equals("if")){
-                l = getLivello(righe[i]);
-                z+=1;
-                while(z < righe.length && getLivello(righe[z]) != l)
-                    z+=1;
-                if(z != righe.length && righe[z].replace("\t","").equals("else")){
-                    String op = tokens[2];
-                    switch(op){
-                        case "<":
-                            op = ">=";
-                            break;
-                        case ">":
-                            op = "<=";
-                            break;
-                        case ">=":
-                            op = "<";
-                            break;
-                        case "<=":
-                            op = ">";
-                            break;
-                        case "==":
-                            op = "!=";
-                            break;
-                        case "!=":
-                            op = "==";
-                            break;
-                    }
-                    String nuovoIf = "\t".repeat(l)+"if "+tokens[1]+" "+op+" "+tokens[3];
-                    righe[z] = nuovoIf;
-                }
+public static void trasformaElse(String[] righe) {
+    for (int i = 0; i < righe.length; i++) {
+        String linea = righe[i].trim();
+        
+        // Debug: mostra la riga corrente
+        System.out.println("Controllando riga " + (i+1) + ": " + linea);
+        
+        // Controlliamo che la riga inizi con "if"
+        if (linea.startsWith("if")) {
+            int livello = getLivello(righe[i]); // Otteniamo il livello della riga
+            String[] tokens = modifica(linea, ' ', '#').split(" ");
+
+            // Debug: mostra i token separati
+            System.out.println("Tokens separati: " + String.join(", ", tokens));
+
+            // Se tokens ha abbastanza informazioni (es. "if x < y")
+            if (tokens.length < 4) {
+                System.out.println("Token insufficienti, salto...");
+                continue;
+            }
+
+            String var1 = tokens[1];
+            String operatore = tokens[2];
+            String var2 = tokens[3];
+
+            // Debug: mostra la condizione dell'if
+            System.out.println("Condizione if: " + var1 + " " + operatore + " " + var2);
+
+            // Cerchiamo l'else corrispondente, allo stesso livello
+            int j = i + 1;
+            while (j < righe.length && getLivello(righe[j]) > livello) {
+                j++;
+            }
+
+            // Debug: mostra la posizione dell'else (se esiste)
+            if (j < righe.length && righe[j].trim().equals("else")) {
+                System.out.println("Trovato 'else' alla riga " + (j+1));
+
+                // Invertiamo l'operatore dell'if
+                String opInverso = invertiOperatore(operatore);
+                String nuovoIf = "\t".repeat(livello) + "if " + var1 + " " + opInverso + " " + var2;
+
+                // Debug: mostra il nuovo if
+                System.out.println("Nuovo 'if': " + nuovoIf);
+
+                // Sostituendo l'else con il nuovo "if" con l'operatore invertito
+                righe[j] = nuovoIf;
+
+                // Dopo aver sostituito, facciamo un break per non continuare a cercare
+                break;
+            } else {
+                System.out.println("Nessun 'else' trovato per questa condizione.");
             }
         }
     }
+}
+
+private static String invertiOperatore(String op) {
+    switch (op) {
+        case "<": return ">=";
+        case ">": return "<=";
+        case ">=": return "<";
+        case "<=": return ">";
+        case "==": return "!=";
+        case "!=": return "==";
+        default: return op; // Se sconosciuto, lasciamo l'operatore invariato
+    }
+}
+
     public static String modifica(String s, char trova, char sostituisci){
         StringBuilder str = new StringBuilder();
         boolean trovata = false;
