@@ -10,10 +10,10 @@ public static void trasformaElse(String[] righe) {
         System.out.println("Controllando riga " + (i+1) + ": " + linea);
         
         // Controlliamo che la riga inizi con "if"
-        if (linea.startsWith("if")) {
+        if (linea.startsWith("if") && linea.split(" ").length <= 4) {
             int livello = getLivello(righe[i]); // Otteniamo il livello della riga
             String[] tokens = modifica(linea, ' ', '#').split(" ");
-
+    
             // Debug: mostra i token separati
             System.out.println("Tokens separati: " + String.join(", ", tokens));
 
@@ -42,7 +42,7 @@ public static void trasformaElse(String[] righe) {
 
                 // Invertiamo l'operatore dell'if
                 String opInverso = invertiOperatore(operatore);
-                String nuovoIf = "\t".repeat(livello) + "if " + var1 + " " + opInverso + " " + var2;
+                String nuovoIf = "\t".repeat(livello) + "if " + var1 + " " + opInverso + " " + var2 + " elsato";
 
                 // Debug: mostra il nuovo if
                 System.out.println("Nuovo 'if': " + nuovoIf);
@@ -51,7 +51,7 @@ public static void trasformaElse(String[] righe) {
                 righe[j] = nuovoIf;
 
                 // Dopo aver sostituito, facciamo un break per non continuare a cercare
-                break;
+                continue;
             } else {
                 System.out.println("Nessun 'else' trovato per questa condizione.");
             }

@@ -71,7 +71,7 @@ public class Compilatore{
             String[] righe = s.replace("\n","").split(";");
             //controlloErrori(righe);
             Funzioni.trasformaElse(righe);
-            ElevaErr(0,0,String.join("\n", righe));
+            //ElevaErr(0,0,String.join("\n", righe));
             for(int i=0;i<righe.length;i++){
                 livello = Funzioni.getLivello(righe[i]);
                 //System.out.println("livello: " + Funzioni.getLivello(righe[i]));
