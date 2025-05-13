@@ -1,0 +1,19 @@
+#Thu May 01 13:14:04 CEST 2025
+bluej.teamsettings.git.branch=
+bluej.teamsettings.git.port=3000
+bluej.teamsettings.git.protocol=http
+bluej.teamsettings.git.repositoryPrefix=/lore/test
+bluej.teamsettings.git.server=localhost
+bluej.teamsettings.ignore1=.*\\.class
+bluej.teamsettings.ignore2=bluej\\.pkh
+bluej.teamsettings.ignore3=team\\.defs
+bluej.teamsettings.ignore4=.*\\.ctxt
+bluej.teamsettings.ignore5=.*\\~
+bluej.teamsettings.ignore6=.*\\\#
+bluej.teamsettings.ignore7=.*\\\#backup
+bluej.teamsettings.ignore8=\\.DS_Store
+bluej.teamsettings.savedpwd=d1gx2kflk9YunGfM7qFOLw\=\=
+bluej.teamsettings.user=lore
+bluej.teamsettings.vcs=git
+bluej.teamsettings.yourEmail=lore@lore.com
+bluej.teamsettings.yourName=lore
