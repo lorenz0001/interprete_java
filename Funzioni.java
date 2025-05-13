@@ -2,6 +2,122 @@ import java.io.*;
 import javax.swing.*;
 
 public class Funzioni{
+    public static void trasformaElse(String[] righe){
+        int z;
+        int l;
+        for(int i=0;i<righe.length;i++){
+            z = i;
+            String tokens[] = modifica(righe[i].trim(), ' ', '#').split(" ");
+            if(tokens[0].equals("if")){
+                l = getLivello(righe[i]);
+                z+=1;
+                while(z < righe.length && getLivello(righe[z]) != l)
+                    z+=1;
+                if(z != righe.length && righe[z].replace("\t","").equals("else")){
+                    String op = tokens[2];
+                    switch(op){
+                        case "<":
+                            op = ">=";
+                            break;
+                        case ">":
+                            op = "<=";
+                            break;
+                        case ">=":
+                            op = "<";
+                            break;
+                        case "<=":
+                            op = ">";
+                            break;
+                        case "==":
+                            op = "!=";
+                            break;
+                        case "!=":
+                            op = "==";
+                            break;
+                    }
+                    String nuovoIf = "\t".repeat(l)+"if "+tokens[1]+" "+op+" "+tokens[3];
+                    righe[z] = nuovoIf;
+                }
+            }
+        }
+    }
+    public static String modifica(String s, char trova, char sostituisci){
+        StringBuilder str = new StringBuilder();
+        boolean trovata = false;
+        String temp = "";
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i) == '"'){
+                trovata = !trovata;
+                str.append('"');
+            } else if(s.charAt(i) == trova && trovata){
+                str.append(sostituisci);
+            } else {
+                str.append(s.charAt(i));
+            }
+        }
+        return str.toString();
+    }
+    public static int getLivello(String s){
+        /*int z = 0;
+        int j = 0;
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i) == ' '){
+                j+=1;
+            }else
+                return z;
+            if(j == 8){
+                j = 0;
+                z += 1;
+            }
+        }*/
+        int z = 0;
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i) == '\t')
+                z+=1;
+            else
+                return z;
+        }
+        return z;
+    }
+    public static int getTipo(String s){
+        try{
+            Integer.parseInt(s);
+            return 1;
+        }catch(Exception e){
+            try{
+                Double.parseDouble(s);
+                return 2;
+            } catch(Exception e2){
+                return 3;
+            }
+        }
+    }
+    public static double getNumero(Variabile v){
+        if(v.tipo == 1)
+            return Double.parseDouble(Integer.toString(v.val1));
+        else
+            return v.val2;
+    }
+    public static String converti(Variabile v){
+        if(v == null)
+            return null;
+        switch(v.tipo){
+            case 1:
+                return ""+v.val1;
+            case 2:
+                return ""+v.val2;
+            case 3:
+                return v.val3;
+        }
+        return null;
+    }
+    public static void printError(Exception e){
+        Compilatore.errArea.setText(e.getMessage());
+    }
+    public static void printOut(String s){
+        Compilatore.outString+="\n"+s;
+        Compilatore.outArea.setText(Compilatore.outString);
+    }
     public static boolean checkEsiste(String nomeFile, String mail) throws IOException{
         FileReader f = new FileReader(nomeFile);
         BufferedReader r = new BufferedReader(f);

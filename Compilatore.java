@@ -11,7 +11,6 @@ public class Compilatore{
     static JTextArea outArea;
     static String outString;
     static Variabile v;
-    static Stack condizioni;
     public static boolean controlloSintattico(String s, String[] diz){
         for(int j=0;j<diz.length;j++){
             if(s.equals(diz[j])){
@@ -47,29 +46,8 @@ public class Compilatore{
             }
         }
     }
-    public static void printError(Exception e){
-        errArea.setText(e.getMessage());
-    }
-    public static void printOut(String s){
-        outString+="\n"+s;
-        outArea.setText(outString);
-    }
-    public static String modifica(String s, char trova, char sostituisci){
-        StringBuilder str = new StringBuilder();
-        boolean trovata = false;
-        String temp = "";
-        for(int i=0;i<s.length();i++){
-            if(s.charAt(i) == '"'){
-                trovata = !trovata;
-                str.append('"');
-            } else if(s.charAt(i) == trova && trovata){
-                str.append(sostituisci);
-            } else {
-                str.append(s.charAt(i));
-            }
-        }
-        return str.toString();
-    }
+    
+    
     public static String getCodice(String s) throws Err{
         /*INIZIO
          * 
@@ -78,70 +56,8 @@ public class Compilatore{
         int fine = s.indexOf("END");
         return s.substring(inizio, fine);
     }
-    public static int getLivello(String s){
-        /*int z = 0;
-        int j = 0;
-        for(int i=0;i<s.length();i++){
-            if(s.charAt(i) == ' '){
-                j+=1;
-            }else
-                return z;
-            if(j == 8){
-                j = 0;
-                z += 1;
-            }
-        }*/
-        int z = 0;
-        for(int i=0;i<s.length();i++){
-            if(s.charAt(i) == '\t')
-                z+=1;
-            else
-                return z;
-        }
-        return z;
-    }
-    public static void trasformaElse(String[] righe){
-        condizioni = new Stack();
-        Op preso;
-        int z;
-        int l;
-        for(int i=0;i<righe.length;i++){
-            z = i;
-            String tokens[] = modifica(righe[i].trim(), ' ', '#').split(" ");
-            if(tokens[0].equals("if")){
-                l = getLivello(righe[i]);
-                z+=1;
-                while(z < righe.length && getLivello(righe[z]) != l)
-                    z+=1;
-                if(z != righe.length && righe[z].equals("else")){
-                    
-                    String op = tokens[2];
-                    switch(op){
-                        case "<":
-                            op = ">=";
-                            break;
-                        case ">":
-                            op = "<=";
-                            break;
-                        case ">=":
-                            op = "<";
-                            break;
-                        case "<=":
-                            op = ">";
-                            break;
-                        case "==":
-                            op = "!=";
-                            break;
-                        case "!=":
-                            op = "==";
-                            break;
-                    }
-                    String nuovoIf = "if "+tokens[1]+" "+op+" "+tokens[3];
-                    righe[z] = nuovoIf;
-                }
-            }
-        }
-    }
+    
+    
     public static void compila(String s, JTextArea errAreas, JTextArea outAreas, String outStrings){
         variabili = new ListaVar();
         int livello_corrente = 0;
@@ -154,17 +70,20 @@ public class Compilatore{
             outString = outStrings;
             String[] righe = s.replace("\n","").split(";");
             //controlloErrori(righe);
-            trasformaElse(righe);
+            Funzioni.trasformaElse(righe);
             ElevaErr(0,0,String.join("\n", righe));
             for(int i=0;i<righe.length;i++){
-                livello = getLivello(righe[i]);
-                //System.out.println("livello: " + getLivello(righe[i]));
+                livello = Funzioni.getLivello(righe[i]);
+                //System.out.println("livello: " + Funzioni.getLivello(righe[i]));
                 //System.out.println("Livello corrente: " + livello_corrente);
                 /*if(livello_corrente != livello){
-                    while(getLivello(righe[i]) != livello_corrente && i < righe.length)
+                    while(Funzioni.getLivello(righe[i]) != livello_corrente && i < righe.length)
                         i+=1;
                 }*/
-                String tokens[] = modifica(righe[i].trim(), ' ', '#').split(" ");
+                if(livello < livello_corrente){
+                    livello_corrente = livello;
+                }
+                String tokens[] = Funzioni.modifica(righe[i].trim(), ' ', '#').split(" ");
                 switch(tokens[0]){
                     case "let":
                         if(getVar(tokens[1]) != null)
@@ -178,12 +97,12 @@ public class Compilatore{
                     case "print":
                         String param = tokens[1];//.substring(1,tokens[1].length()-1);
                         if(param.charAt(0) == '"'){
-                            printOut(param.substring(1,param.length()-1));
+                            Funzioni.printOut(param.substring(1,param.length()-1));
                         } else {
-                            String str = converti(getVar(param));
+                            String str = Funzioni.converti(getVar(param));
                             if(str == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
-                            printOut(modifica(str, '#', ' '));
+                            Funzioni.printOut(Funzioni.modifica(str, '#', ' '));
                         }
                         break;
                     case "else":
@@ -210,36 +129,36 @@ public class Compilatore{
                         }
                         switch(ope){
                             case ">":
-                                if(getNumero(v1) > getNumero(v2))
+                                if(Funzioni.getNumero(v1) > Funzioni.getNumero(v2))
                                     livello_corrente+=1;
                                 break;
                             case "<":
-                                if(getNumero(v1) < getNumero(v2))
+                                if(Funzioni.getNumero(v1) < Funzioni.getNumero(v2))
                                     livello_corrente+=1;
                                 break;
                             case ">=":
-                                if(getNumero(v1) >= getNumero(v2))
+                                if(Funzioni.getNumero(v1) >= Funzioni.getNumero(v2))
                                     livello_corrente+=1;
                                 break;
                             case "<=":
-                                if(getNumero(v1) <= getNumero(v2))
+                                if(Funzioni.getNumero(v1) <= Funzioni.getNumero(v2))
                                     livello_corrente+=1;
                                 break;
                             case "==":
-                                if(getNumero(v1) == getNumero(v2))
+                                if(Funzioni.getNumero(v1) == Funzioni.getNumero(v2))
                                     livello_corrente+=1;
                                 break;
                             case "!=":
-                                if(getNumero(v1) != getNumero(v2))
+                                if(Funzioni.getNumero(v1) != Funzioni.getNumero(v2))
                                     livello_corrente+=1;
                                 break;
                         }
                         
                         if(livello_corrente == livello){
                             i+=1;
-                            while(i < righe.length && getLivello(righe[i]) != livello_corrente){
+                            while(i < righe.length && Funzioni.getLivello(righe[i]) != livello_corrente){
                                 i+=1;
-                                if(i < righe.length && getLivello(righe[i]) < livello_corrente){
+                                if(i < righe.length && Funzioni.getLivello(righe[i]) < livello_corrente){
                                     livello_corrente-=1;
                                     System.out.println("idnaiu2");
                                 }
@@ -257,32 +176,14 @@ public class Compilatore{
                 }
             }
         } catch(Err e){
-            printError(e);
+            Funzioni.printError(e);
         }
     }
-    public static double getNumero(Variabile v){
-        if(v.tipo == 1)
-            return Double.parseDouble(Integer.toString(v.val1));
-        else
-            return v.val2;
-    }
-    public static String converti(Variabile v){
-        if(v == null)
-            return null;
-        switch(v.tipo){
-            case 1:
-                return ""+v.val1;
-            case 2:
-                return ""+v.val2;
-            case 3:
-                return v.val3;
-        }
-        return null;
-    }
+    
     static Variabile creaVar(String s){
         Variabile v;
         if((v = getVar(s)) == null){
-            int tipo = getTipo(s);
+            int tipo = Funzioni.getTipo(s);
             switch(tipo){
                 case 1:
                     return new Variabile("",tipo,Integer.parseInt(s));
@@ -334,7 +235,7 @@ public class Compilatore{
             ElevaErr(riga+1, 0, "Dichiarazione non valida, manca l'uguale controlla meglio");
         }
         tokens[3-q] = r.substring(r.indexOf("=")+1, r.length()).trim();
-        tipo = getTipo(tokens[3-q]);
+        tipo = Funzioni.getTipo(tokens[3-q]);
         switch(tipo){
             case 1:
                 if(q == 0){
@@ -367,19 +268,7 @@ public class Compilatore{
                 break;
         }
     }
-    public static int getTipo(String s){
-        try{
-            Integer.parseInt(s);
-            return 1;
-        }catch(Exception e){
-            try{
-                Double.parseDouble(s);
-                return 2;
-            } catch(Exception e2){
-                return 3;
-            }
-        }
-    }
+    
     /*public static void compila() throws IOException{
         FileReader f = new FileReader("./codice.wow7");
         BufferedReader r = new BufferedReader(f);

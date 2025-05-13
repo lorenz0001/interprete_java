@@ -85,7 +85,7 @@ public static void gestisciOperatori(Op op2, Op op1, Op ope) {
                 }
                 if(v.tipo == 3)
                     Compilatore.ElevaErr(riga,0,"Variabile: " + corrente.s + " non compatibile con i calcoli");
-                corrente.s = Compilatore.converti(v);
+                corrente.s = Funzioni.converti(v);
             }
 
             if (isNumero(corrente.s)) {
