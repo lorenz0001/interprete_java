@@ -1,0 +1,52 @@
+let a = 10;
+let b = 5;
+let c = 15;
+let d = 7;
+let e = 3;
+let f = 8;
+let g = 2;
+let h = 0;
+let i = 100;
+let j = 50;
+
+if a < b;
+	print "a è minore di b";
+else;
+	print "a NON è minore di b";
+
+if a == b;
+	print "a è uguale a b";
+else;
+	print "a NON è uguale a b";
+
+if a != b;
+	print "a è diverso da b";
+else;
+	print "a è uguale a b";
+
+if a < c;
+	print "a è minore di c";
+else;
+	print "a NON è minore di c";
+
+if b == d;
+	print "b è uguale a d";
+else;
+	print "b NON è uguale a d";
+
+if e != f;
+	print "e è diverso da f";
+else;
+	print "e è uguale a f";
+
+if g == h;
+	print "g è uguale a h";
+else;
+	print "g NON è uguale a h";
+
+if i > j;
+	print "i è maggiore di j";
+else;
+	print "i NON è maggiore di j";
+
+print "fine script";
