@@ -192,29 +192,17 @@ public class Compilatore{
                                 break;
                         }
                         
-                        if(livello_corrente == livello){ //condizione falsa
+                        if(livello_corrente == livello){
                             i+=1;
-                            livello = getLivello(righe[i]);
-                            while(i < righe.length && livello != livello_corrente){
-                                System.out.println("livello corrente: " + livello_corrente + ",livello: " + livello);
-                                if(livello < livello_corrente)
-                                    livello_corrente-=1;
-                                System.out.println("asinasd");
+                            while(i < righe.length && getLivello(righe[i]) != livello_corrente){
                                 i+=1;
-                                
-                                if(i < righe.length){
-                                    livello = getLivello(righe[i]);
+                                if(i < righe.length && getLivello(righe[i]) < livello_corrente){
+                                    livello_corrente-=1;
+                                    System.out.println("idnaiu2");
                                 }
                             }
+                            i-=1;
                         }
-                        
-                        /*if (i < righe.length){
-                             tokens = modifica(righe[i], ' ', '#').split(" ");
-                            System.out.println("token: " + tokens[0]);
-                            if(tokens[0].equals("else")){
-                                livello_corrente+=1;
-                            }
-                        }*/
                        
                         break;
                     default:
