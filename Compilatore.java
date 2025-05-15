@@ -73,6 +73,7 @@ public class Compilatore{
             Funzioni.trasformaElse(righe);
             //ElevaErr(0,0,String.join("\n", righe));
             for(int i=0;i<righe.length;i++){
+                System.out.println("Istruzione " + righe[i]);
                 livello = Funzioni.getLivello(righe[i]);
                 //System.out.println("livello: " + Funzioni.getLivello(righe[i]));
                 //System.out.println("Livello corrente: " + livello_corrente);
@@ -111,9 +112,9 @@ public class Compilatore{
                     case "goto":
                         if(tokens.length != 2)
                             ElevaErr(i+1, 0, "Sintassi goto sbagliata");
-                        if(Integer.parseInt(tokens[1]) < 0 || Integer.parseInt(tokens[1]) > righe.length-1)
+                        if(Integer.parseInt(tokens[1]) < 1 || Integer.parseInt(tokens[1]) > righe.length)
                             ElevaErr(i+1, 0, "Valore goto non valido");
-                        i = Integer.parseInt(tokens[1]);
+                        i = Integer.parseInt(tokens[1])-1;
                         break;
                     case "if": // if a > b
                         Variabile v1, v2;
@@ -122,6 +123,7 @@ public class Compilatore{
                         System.out.println("v2 " + tokens[3]);
                         String ope = tokens[2];
                         System.out.println("tipo1: "+ v1.tipo + ", tipo2: " + v2.tipo);
+                        
                         if(v1.tipo != v2.tipo)
                             ElevaErr(i+1, 0, "I tipi dei dati da confrontare devono essere gli stessi");
                         
@@ -195,7 +197,7 @@ public class Compilatore{
                 case 1:
                     return new Variabile("",tipo,Integer.parseInt(s));
                 case 2:
-                    return new Variabile("",tipo,Float.parseFloat(s));
+                    return new Variabile("",tipo,Double.parseDouble(s));
                 case 3:
                     return new Variabile("",tipo,s);
             }
@@ -265,10 +267,11 @@ public class Compilatore{
                         modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo, tokens[3-q]));
                 } else {
                     double risultato = Funzioni_calc.main(tokens[3-q], riga);
+                    int k = (risultato == (int) risultato) ? 1 : 2;
                     if(q == 0){
                         variabili.push(new Variabile(tokens[1-q], 2, risultato));
                     } else{
-                        modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], 2, risultato));
+                        modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], k, risultato));
                         
                     }
                 }            
