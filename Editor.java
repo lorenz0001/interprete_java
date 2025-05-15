@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -21,12 +22,50 @@ public class Editor {
         }
     }
 
+    public static class AggiornaNumeriRiga implements DocumentListener {
+        JTextArea codice;
+        JTextArea numeri;
+
+        AggiornaNumeriRiga(JTextArea codice, JTextArea numeri) {
+            this.codice = codice;
+            this.numeri = numeri;
+        }
+
+        private void aggiorna() {
+            int righe = codice.getLineCount();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 1; i <= righe; i++) {
+                sb.append(i).append("\n");
+            }
+            numeri.setText(sb.toString());
+        }
+
+        public void insertUpdate(DocumentEvent e) {
+            aggiorna();
+        }
+
+        public void removeUpdate(DocumentEvent e) {
+            aggiorna();
+        }
+
+        public void changedUpdate(DocumentEvent e) {
+            aggiorna();
+        }
+    }
+
     public static void main(String args[]) {
         JFrame frame = new JFrame("Compilatore");
 
-        // Area codice
+        // Area codice e numeri di riga
         JTextArea areaCodice = new JTextArea(15, 50);
+        JTextArea numeriRiga = new JTextArea("1\n");
+        numeriRiga.setEditable(false);
+        numeriRiga.setBackground(Color.LIGHT_GRAY);
+
+        areaCodice.getDocument().addDocumentListener(new AggiornaNumeriRiga(areaCodice, numeriRiga));
+
         JScrollPane scrollCodice = new JScrollPane(areaCodice);
+        scrollCodice.setRowHeaderView(numeriRiga);
 
         // Area errori
         JTextArea areaErr = new JTextArea(5, 25);
@@ -43,20 +82,23 @@ public class Editor {
 
         JMenu menuCompila = new JMenu("Compila");
         JMenuItem voce = new JMenuItem("Esegui compilazione");
-        voce.addActionListener(new Gestisci(areaCodice, areaErr, areaOut)); // <-- compila va in areaErr
+        voce.addActionListener(new Gestisci(areaCodice, areaErr, areaOut));
         menuCompila.add(voce);
         menuBar.add(menuCompila);
 
-        // Font selector
+        // Font selector (senza generics)
         Integer[] dimensioniFont = {10, 12, 14, 16, 18, 20, 24, 28, 32};
-        JComboBox<Integer> selettoreFont = new JComboBox<>(dimensioniFont);
+        JComboBox selettoreFont = new JComboBox(dimensioniFont);
         selettoreFont.setSelectedItem(32);
-        selettoreFont.addActionListener(e -> {
-            int dimensione = (int) selettoreFont.getSelectedItem();
-            Font nuovoFont = new Font("Monospaced", Font.PLAIN, dimensione);
-            areaCodice.setFont(nuovoFont);
-            areaErr.setFont(nuovoFont);
-            areaOut.setFont(nuovoFont);
+        selettoreFont.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int dimensione = (int) selettoreFont.getSelectedItem();
+                Font nuovoFont = new Font("Monospaced", Font.PLAIN, dimensione);
+                areaCodice.setFont(nuovoFont);
+                areaErr.setFont(nuovoFont);
+                areaOut.setFont(nuovoFont);
+                numeriRiga.setFont(nuovoFont);
+            }
         });
 
         menuBar.add(Box.createHorizontalGlue());
@@ -79,6 +121,7 @@ public class Editor {
         areaCodice.setFont(defaultFont);
         areaErr.setFont(defaultFont);
         areaOut.setFont(defaultFont);
+        numeriRiga.setFont(defaultFont);
 
         frame.pack();
         frame.setLocationRelativeTo(null);
