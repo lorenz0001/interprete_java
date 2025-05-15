@@ -12,7 +12,7 @@ public static void trasformaElse(String[] righe) {
         // Controlliamo che la riga inizi con "if"
         if (linea.startsWith("if") && linea.split(" ").length <= 4) {
             int livello = getLivello(righe[i]); // Otteniamo il livello della riga
-            String[] tokens = modifica(linea, ' ', '#').split(" ");
+            String[] tokens = modificaString(linea, ' ', '#').split(" ");
     
             // Debug: mostra i token separati
             System.out.println("Tokens separati: " + String.join(", ", tokens));
@@ -71,7 +71,7 @@ private static String invertiOperatore(String op) {
     }
 }
 
-    public static String modifica(String s, char trova, char sostituisci){
+    public static String modificaString(String s, char trova, char sostituisci){
         StringBuilder str = new StringBuilder();
         boolean trovata = false;
         String temp = "";
@@ -202,7 +202,8 @@ private static String invertiOperatore(String op) {
                 if(riga[1].equals(password)){
                     //CreaFinestra.crea("Accesso garantito");
                     frame.dispose();
-                    Editor.main();
+                    String args[] = {"",""};
+                    Editor.main(args);
                 }else{
                     CreaFinestra.crea("Password dell'utenza errata");
                     return false;

@@ -21,7 +21,7 @@ public class Editor {
         }
     }
 
-    public static void main() {
+    public static void main(String args[]) {
         JFrame frame = new JFrame("Compilatore");
 
         // Area codice

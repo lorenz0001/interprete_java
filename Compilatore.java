@@ -83,7 +83,7 @@ public class Compilatore{
                 if(livello < livello_corrente){
                     livello_corrente = livello;
                 }
-                String tokens[] = Funzioni.modifica(righe[i].trim(), ' ', '#').split(" ");
+                String tokens[] = Funzioni.modificaString(righe[i].trim(), ' ', '#').split(" ");
                 switch(tokens[0]){
                     case "let":
                         if(getVar(tokens[1]) != null)
@@ -97,16 +97,23 @@ public class Compilatore{
                     case "print":
                         String param = tokens[1];//.substring(1,tokens[1].length()-1);
                         if(param.charAt(0) == '"'){
-                            Funzioni.printOut(param.substring(1,param.length()-1));
+                            Funzioni.printOut(Funzioni.modificaString(param.substring(1,param.length()-1), '#', ' '));
                         } else {
                             String str = Funzioni.converti(getVar(param));
                             if(str == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
-                            Funzioni.printOut(Funzioni.modifica(str, '#', ' '));
+                            Funzioni.printOut(Funzioni.modificaString(str, '#', ' '));
                         }
                         break;
                     case "else":
                         ElevaErr(i+1, 0, "Else non previsto");
+                        break;
+                    case "goto":
+                        if(tokens.length != 2)
+                            ElevaErr(i+1, 0, "Sintassi goto sbagliata");
+                        if(Integer.parseInt(tokens[1]) < 0 || Integer.parseInt(tokens[1]) > righe.length-1)
+                            ElevaErr(i+1, 0, "Valore goto non valido");
+                        i = Integer.parseInt(tokens[1]);
                         break;
                     case "if": // if a > b
                         Variabile v1, v2;
