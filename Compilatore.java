@@ -2,7 +2,7 @@ import java.io.*;
 import javax.swing.JTextArea;
 
 public class Compilatore{
-    static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>"+'\t'+'"';
+    static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>%"+'\t'+'"';
     static String[] dizionario = {
           "if", "let", "while", "for", "print", "else"
     };
@@ -96,11 +96,13 @@ public class Compilatore{
                         dizionario = nuovoDizionario;
                         break;
                     case "print":
+                        
                         String param = tokens[1];//.substring(1,tokens[1].length()-1);
                         if(param.charAt(0) == '"'){
                             Funzioni.printOut(Funzioni.modificaString(param.substring(1,param.length()-1), '#', ' '));
                         } else {
                             String str = Funzioni.converti(getVar(param));
+                            System.out.println("PRINT CHIAMATO "  + str);
                             if(str == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
                             Funzioni.printOut(Funzioni.modificaString(str, '#', ' '));
@@ -114,7 +116,9 @@ public class Compilatore{
                             ElevaErr(i+1, 0, "Sintassi goto sbagliata");
                         if(Integer.parseInt(tokens[1]) < 1 || Integer.parseInt(tokens[1]) > righe.length)
                             ElevaErr(i+1, 0, "Valore goto non valido");
-                        i = Integer.parseInt(tokens[1])-1;
+                        i = Integer.parseInt(tokens[1])-1-1;
+                        System.out.println("GOTO A " + i+1);
+                        livello_corrente = Funzioni.getLivello(righe[i]);
                         break;
                     case "if": // if a > b
                         Variabile v1, v2;
@@ -218,7 +222,7 @@ public class Compilatore{
     
     public static void modificaVar(Variabile s, Variabile d) {
     Variabile v = variabili.testa;
-
+    System.out.println("kads" + Funzioni.converti(s) + " " + Funzioni.converti(d));
     if (v == s) {
         d.next = s.next; // collega il nuovo nodo
         variabili.testa = d;
@@ -226,9 +230,11 @@ public class Compilatore{
     }
 
     while (v != null && v.next != null) {
+        System.out.println("fiesta");
         if (v.next == s) {
             d.next = s.next; // collega il nuovo nodo
             v.next = d;
+            System.out.println("bakq" + Funzioni.converti(s) + " " + Funzioni.converti(d));
             break;
         }
         v = v.next;
@@ -250,8 +256,9 @@ public class Compilatore{
                 if(q == 0){
                     variabili.push(new Variabile(tokens[1-q], tipo, Integer.parseInt(tokens[3])));
                     System.out.println("ciao");
-                }else
+                }else{
                     modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo,  Integer.parseInt(tokens[3-q])));
+                }
                 break;
             case 2:
                 if(q == 0)
@@ -266,13 +273,20 @@ public class Compilatore{
                     else
                         modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo, tokens[3-q]));
                 } else {
-                    double risultato = Funzioni_calc.main(tokens[3-q], riga);
+                    double risultato = Funzioni_calc.main(tokens[3 - q], riga);
                     int k = (risultato == (int) risultato) ? 1 : 2;
+                    System.out.println("risutato: " + tokens[1-q] + " " + risultato + " " + k +" " + q);
                     if(q == 0){
                         variabili.push(new Variabile(tokens[1-q], 2, risultato));
                     } else{
-                        modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], k, risultato));
-                        
+                        if(k == 1){
+                            System.out.println("nig " + Funzioni.converti(getVar(tokens[1-q])) + " " + k);
+                            modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], k, (int)risultato));
+                        }
+                        else
+                            modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], k, risultato));
+                        //System.out.println("variabile " + getVar(tokens[1-q]).nome + " " + k + " " + risultato + "\n");
+                        //System.out.println("CambioVar, " + tokens[1-q] + " " + risultato);
                     }
                 }            
                 break;

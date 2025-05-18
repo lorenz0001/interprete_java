@@ -53,7 +53,7 @@ public class Editor {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main() {
         JFrame frame = new JFrame("Compilatore");
 
         // Area codice e numeri di riga

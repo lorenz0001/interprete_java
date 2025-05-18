@@ -1,0 +1,12 @@
+let a = 10;
+let b = 7;
+let resto_a = a % 2;
+let resto_b = b % 2;
+if resto_a == 0.0;
+	print "a è pari";
+else;
+	print "a è dispari";
+if resto_b == 0.0;
+	print "b è pari";
+else;
+	print "b è dispari";

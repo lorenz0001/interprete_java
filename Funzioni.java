@@ -129,10 +129,12 @@ private static String invertiOperatore(String op) {
             return v.val2;
     }
     public static String converti(Variabile v){
+        System.out.println("RETURN DI " + v.nome + " " + v.tipo + "\n");
         if(v == null)
             return null;
         switch(v.tipo){
             case 1:
+                System.out.println("valore: " + v.val1);
                 return ""+v.val1;
             case 2:
                 return ""+v.val2;
@@ -203,7 +205,7 @@ private static String invertiOperatore(String op) {
                     //CreaFinestra.crea("Accesso garantito");
                     frame.dispose();
                     String args[] = {"",""};
-                    Editor.main(args);
+                    //Editor.main(args);
                 }else{
                     CreaFinestra.crea("Password dell'utenza errata");
                     return false;

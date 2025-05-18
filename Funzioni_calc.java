@@ -1,6 +1,6 @@
 public class Funzioni_calc{
     static String[] oper = {
-        "+","-","*","/"
+        "+","-","*","/","%"
     };
     public static boolean isNumero(String t){
         try{
@@ -29,6 +29,9 @@ public static void gestisciOperatori(Op op2, Op op1, Op ope) {
             case "-":
                 op1.n = op1.n - op2.n;
                 break;
+            case "%":
+                op1.n = op1.n % op2.n;
+                break;
         }
     }
 
@@ -48,10 +51,10 @@ public static void gestisciOperatori(Op op2, Op op1, Op ope) {
         if (op2.s.equals(")")) {
             return -2;
         }
-        if ((op1.s.equals("+") || op1.s.equals("-")) && (op2.s.equals("*") || op2.s.equals("/"))) {
+        if ((op1.s.equals("+") || op1.s.equals("-")) && (op2.s.equals("*") || op2.s.equals("/") || op2.s.equals("%"))) {
             return -1;
         }
-        if ((op1.s.equals("*") || op1.s.equals("/")) && (op2.s.equals("+") || op2.s.equals("-"))) {
+        if ((op1.s.equals("*") || op1.s.equals("/") || op1.s.equals("%")) && (op2.s.equals("+") || op2.s.equals("-"))) {
             return 1;
         }
         return 0;
