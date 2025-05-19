@@ -13,7 +13,10 @@ public class Variabile{
     Variabile(String n, int t, double val){
         nome = n;
         tipo = t;
-        val2 = val;
+        if(val == (int)val)
+            val1 = (int)val;
+        else
+            val2 = val;
     }
     Variabile(String n, int t, String val){
         nome = n;

@@ -100,9 +100,26 @@ public class Compilatore{
                         String param = tokens[1];//.substring(1,tokens[1].length()-1);
                         if(param.charAt(0) == '"'){
                             Funzioni.printOut(Funzioni.modificaString(param.substring(1,param.length()-1), '#', ' '));
-                        } else {
+                        } else if (param.charAt(0) == '('){ // print ("ciao" + 3 + "mondo");
+                            param = param.substring(1,param.length()-1);
+                            String[] tokens_print = param.split("\\+");
+                            //System.out.println(tokens_print[0] + tokens_print[1]);
+                            int k = 0;
+                            for(int z=0;i<tokens_print.length;z++){
+                                //System.out.println(tokens_print[z]);
+                                if(tokens_print[z].charAt(0) == '"'){
+                                    Funzioni.printOut(tokens_print[z].substring(1,tokens_print[z].length()-1));
+                                    
+                                }
+                                else{
+                                    String str = Funzioni.converti(getVar(param));
+                                    if(str == null)
+                                        ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
+                                    Funzioni.printOut(Funzioni.modificaString(str, '#', ' '));
+                            }
+                            }
+                        }else{
                             String str = Funzioni.converti(getVar(param));
-                            System.out.println("PRINT CHIAMATO "  + str);
                             if(str == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
                             Funzioni.printOut(Funzioni.modificaString(str, '#', ' '));
@@ -243,53 +260,48 @@ public class Compilatore{
 
     
     public static void dichiara(String[] tokens, int riga, String r, int q) throws Err{
-        int tipo;
-        if(tokens.length < 4-q){
-            ElevaErr(riga+1, 0, "Dichiarazione non valida, lunghezza dichiarazione");
-        } else if(!tokens[2-q].equals("=")){
-            ElevaErr(riga+1, 0, "Dichiarazione non valida, manca l'uguale controlla meglio");
+        if(tokens.length < 4 - q || !tokens[2 - q].equals("=")) {
+            ElevaErr(riga + 1, 0, "Dichiarazione non valida");
+            return;
         }
-        tokens[3-q] = r.substring(r.indexOf("=")+1, r.length()).trim();
-        tipo = Funzioni.getTipo(tokens[3-q]);
-        switch(tipo){
-            case 1:
-                if(q == 0){
-                    variabili.push(new Variabile(tokens[1-q], tipo, Integer.parseInt(tokens[3])));
-                    System.out.println("ciao");
-                }else{
-                    modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo,  Integer.parseInt(tokens[3-q])));
+        
+        String nomeVar = tokens[1 - q];
+        String valoreStr = r.substring(r.indexOf("=") + 1).trim();
+        int tipo = Funzioni.getTipo(valoreStr);
+        
+        Variabile nuovaVar;
+        
+        switch(tipo) {
+            case 1: // Intero
+                System.out.println("viasd");
+                nuovaVar = new Variabile(nomeVar, tipo, Integer.parseInt(valoreStr));
+                break;
+            case 2: // Float
+                nuovaVar = new Variabile(nomeVar, tipo, Float.parseFloat(valoreStr));
+                break;
+            case 3: // Stringa o espressione
+                if (valoreStr.startsWith("\"") && valoreStr.endsWith("\"")) {
+                    nuovaVar = new Variabile(nomeVar, tipo, valoreStr);
+                } else {
+                    double risultato = Funzioni_calc.main(valoreStr, riga);
+                    tipo = (risultato == (int) risultato) ? 1 : 2;
+                    System.out.println("tipo vaar  " + tipo + (int) risultato);
+                    nuovaVar = new Variabile(nomeVar, tipo, (tipo == 1) ? (int) risultato : risultato);
+                    System.out.println("vuad" + nuovaVar.tipo + " " + nuovaVar.tipo + " " + nuovaVar.val1 + " " + nuovaVar.val2);
                 }
                 break;
-            case 2:
-                if(q == 0)
-                    variabili.push(new Variabile(tokens[1-q], tipo, Float.parseFloat(tokens[3])));
-                else
-                    modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo,  Float.parseFloat(tokens[3-q])));
-                break;
-            case 3:
-                if(tokens[3-q].charAt(0) == '"' && tokens[3-q].charAt(tokens[3-q].length()-1) == '"'){
-                    if(q == 0)
-                        variabili.push(new Variabile(tokens[1-q], tipo, tokens[3-q]));
-                    else
-                        modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], tipo, tokens[3-q]));
-                } else {
-                    double risultato = Funzioni_calc.main(tokens[3 - q], riga);
-                    int k = (risultato == (int) risultato) ? 1 : 2;
-                    System.out.println("risutato: " + tokens[1-q] + " " + risultato + " " + k +" " + q);
-                    if(q == 0){
-                        variabili.push(new Variabile(tokens[1-q], 2, risultato));
-                    } else{
-                        if(k == 1){
-                            System.out.println("nig " + Funzioni.converti(getVar(tokens[1-q])) + " " + k);
-                            modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], k, (int)risultato));
-                        }
-                        else
-                            modificaVar(getVar(tokens[1-q]), new Variabile(tokens[1-q], k, risultato));
-                        //System.out.println("variabile " + getVar(tokens[1-q]).nome + " " + k + " " + risultato + "\n");
-                        //System.out.println("CambioVar, " + tokens[1-q] + " " + risultato);
-                    }
-                }            
-                break;
+            default:
+                ElevaErr(riga + 1, 0, "Tipo di valore non supportato");
+                return;
+        }
+        
+        if (q == 0)
+            variabili.push(nuovaVar);
+        else{
+            modificaVar(getVar(nomeVar), nuovaVar);
+            System.out.println("quo");
+            System.out.println(getVar(nomeVar).nome + " " + getVar(nomeVar).tipo + " " + getVar(nomeVar).val1);
+            System.out.println("asdasd");
         }
     }
     
