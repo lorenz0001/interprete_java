@@ -85,6 +85,8 @@ public class Compilatore{
                     livello_corrente = livello;
                 }
                 String tokens[] = Funzioni.modificaString(righe[i].trim(), ' ', '#').split(" ");
+                if(righe[i].startsWith("//"))
+                    continue;
                 switch(tokens[0]){
                     case "let":
                         if(getVar(tokens[1]) != null)
@@ -96,28 +98,26 @@ public class Compilatore{
                         dizionario = nuovoDizionario;
                         break;
                     case "print":
-                        
-                        String param = tokens[1];//.substring(1,tokens[1].length()-1);
-                        if(param.charAt(0) == '"'){
-                            Funzioni.printOut(Funzioni.modificaString(param.substring(1,param.length()-1), '#', ' '));
-                        } else if (param.charAt(0) == '('){ // print ("ciao" + 3 + "mondo");
-                            param = param.substring(1,param.length()-1);
+                        String param = tokens[1];
+                        if (param.charAt(0) == '"') {
+                            Funzioni.printOut(Funzioni.modificaString2(param.substring(1, param.length()-1), '#', ' '));
+                        } else if (param.charAt(0) == '(') {
+                            param = param.substring(1, param.length()-1);
+                            System.out.println("param: " + param);
                             String[] tokens_print = param.split("\\+");
-                            //System.out.println(tokens_print[0] + tokens_print[1]);
-                            int k = 0;
-                            for(int z=0;i<tokens_print.length;z++){
-                                //System.out.println(tokens_print[z]);
-                                if(tokens_print[z].charAt(0) == '"'){
-                                    Funzioni.printOut(tokens_print[z].substring(1,tokens_print[z].length()-1));
-                                    
+                            String stringa = "";
+                            for (int z = 0; z < tokens_print.length; z++) {
+                                tokens_print[z] = tokens_print[z].trim();
+                                if (tokens_print[z].charAt(0) == '"') {
+                                    stringa += Funzioni.modificaString2(tokens_print[z].substring(1, tokens_print[z].length()-1),'#',' ');
+                                } else {
+                                    String str = Funzioni.converti(getVar(tokens_print[z]));
+                                    if (str == null)
+                                        ElevaErr(i + 1, 0, "La variabile " + tokens_print[z] + " non esiste");
+                                    stringa += Funzioni.modificaString2(str, '#', ' ');
                                 }
-                                else{
-                                    String str = Funzioni.converti(getVar(param));
-                                    if(str == null)
-                                        ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
-                                    Funzioni.printOut(Funzioni.modificaString(str, '#', ' '));
                             }
-                            }
+                            Funzioni.printOut(stringa);
                         }else{
                             String str = Funzioni.converti(getVar(param));
                             if(str == null)
@@ -281,7 +281,7 @@ public class Compilatore{
                 break;
             case 3: // Stringa o espressione
                 if (valoreStr.startsWith("\"") && valoreStr.endsWith("\"")) {
-                    nuovaVar = new Variabile(nomeVar, tipo, valoreStr);
+                    nuovaVar = new Variabile(nomeVar, tipo, valoreStr.substring(1,valoreStr.length()-1));
                 } else {
                     double risultato = Funzioni_calc.main(valoreStr, riga);
                     tipo = (risultato == (int) risultato) ? 1 : 2;

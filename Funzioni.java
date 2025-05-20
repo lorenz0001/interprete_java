@@ -87,6 +87,18 @@ private static String invertiOperatore(String op) {
         }
         return str.toString();
     }
+    public static String modificaString2(String s, char trova, char sostituisci){
+        StringBuilder str = new StringBuilder();
+        boolean trovata = false;
+        for(int i=0;i<s.length();i++){
+            char c = s.charAt(i);
+            if(c == trova)
+                str.append(sostituisci);
+            else
+                str.append(c);
+        }
+        return str.toString();
+    }
     public static int getLivello(String s){
         /*int z = 0;
         int j = 0;
@@ -147,7 +159,7 @@ private static String invertiOperatore(String op) {
         Compilatore.errArea.setText(e.getMessage());
     }
     public static void printOut(String s){
-        Compilatore.outString+="\n"+s;
+        Compilatore.outString+=s+"\n";
         Compilatore.outArea.setText(Compilatore.outString);
     }
     public static boolean checkEsiste(String nomeFile, String mail) throws IOException{
