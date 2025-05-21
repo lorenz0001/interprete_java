@@ -2,12 +2,12 @@ import java.io.*;
 import javax.swing.*;
 
 public class Funzioni{
-public static void trasformaElse(String[] righe) {
+public static void trasformaElse(String[] righe) throws Err{
     for (int i = 0; i < righe.length; i++) {
         String linea = righe[i].trim();
         
         // Debug: mostra la riga corrente
-        System.out.println("Controllando riga " + (i+1) + ": " + linea);
+        //System.out.println("Controllando riga " + (i+1) + ": " + linea);
         
         // Controlliamo che la riga inizi con "if"
         if (linea.startsWith("if") && linea.split(" ").length <= 4) {
@@ -15,13 +15,11 @@ public static void trasformaElse(String[] righe) {
             String[] tokens = modificaString(linea, ' ', '#').split(" ");
     
             // Debug: mostra i token separati
-            System.out.println("Tokens separati: " + String.join(", ", tokens));
+            //System.out.println("Tokens separati: " + String.join(", ", tokens));
 
             // Se tokens ha abbastanza informazioni (es. "if x < y")
-            if (tokens.length < 4) {
-                System.out.println("Token insufficienti, salto...");
-                continue;
-            }
+            if (tokens.length < 4)
+                Compilatore.ElevaErr(i + 1, 0, "IF non valido ");
 
             String var1 = tokens[1];
             String operatore = tokens[2];

@@ -71,9 +71,7 @@ public class Compilatore{
             String[] righe = s.replace("\n","").split(";");
             //controlloErrori(righe);
             Funzioni.trasformaElse(righe);
-            //ElevaErr(0,0,String.join("\n", righe));
             for(int i=0;i<righe.length;i++){
-                System.out.println("Istruzione " + righe[i]);
                 livello = Funzioni.getLivello(righe[i]);
                 //System.out.println("livello: " + Funzioni.getLivello(righe[i]));
                 //System.out.println("Livello corrente: " + livello_corrente);
@@ -102,12 +100,26 @@ public class Compilatore{
                         if (param.charAt(0) == '"') {
                             Funzioni.printOut(Funzioni.modificaString2(param.substring(1, param.length()-1), '#', ' '));
                         } else if (param.charAt(0) == '(') {
-                            param = param.substring(1, param.length()-1);
-                            System.out.println("param: " + param);
+                            param = righe[i].substring(righe[i].indexOf("print (")+7, righe[i].length()-1);
+                            StringBuilder p = new StringBuilder();
+                            boolean trovata = false;
+                            for(int h=0;h<param.length();h++){
+                                if(param.charAt(h) == '"')
+                                    trovata = !trovata;
+                                
+                                if(trovata){
+                                    p.append(param.charAt(h));
+                                } else {
+                                    if(param.charAt(h) != ' ')
+                                        p.append(param.charAt(h));
+                                }
+                            }
+                            param = p.toString();
+                            System.out.println(param);
                             String[] tokens_print = param.split("\\+");
                             String stringa = "";
                             for (int z = 0; z < tokens_print.length; z++) {
-                                tokens_print[z] = tokens_print[z].trim();
+                                //System.out.println("token: " + tokens_print[z]);
                                 if (tokens_print[z].charAt(0) == '"') {
                                     stringa += Funzioni.modificaString2(tokens_print[z].substring(1, tokens_print[z].length()-1),'#',' ');
                                 } else {
@@ -134,16 +146,16 @@ public class Compilatore{
                         if(Integer.parseInt(tokens[1]) < 1 || Integer.parseInt(tokens[1]) > righe.length)
                             ElevaErr(i+1, 0, "Valore goto non valido");
                         i = Integer.parseInt(tokens[1])-1-1;
-                        System.out.println("GOTO A " + i+1);
+                        //System.out.println("GOTO A " + i+1);
                         livello_corrente = Funzioni.getLivello(righe[i]);
                         break;
                     case "if": // if a > b
                         Variabile v1, v2;
                         v1 = creaVar(tokens[1]);
                         v2 = creaVar(tokens[3]);
-                        System.out.println("v2 " + tokens[3]);
+                        //System.out.println("v2 " + tokens[3]);
                         String ope = tokens[2];
-                        System.out.println("tipo1: "+ v1.tipo + ", tipo2: " + v2.tipo);
+                        //System.out.println("tipo1: "+ v1.tipo + ", tipo2: " + v2.tipo);
                         
                         if(v1.tipo != v2.tipo)
                             ElevaErr(i+1, 0, "I tipi dei dati da confrontare devono essere gli stessi");
@@ -190,7 +202,6 @@ public class Compilatore{
                                 i+=1;
                                 if(i < righe.length && Funzioni.getLivello(righe[i]) < livello_corrente){
                                     livello_corrente-=1;
-                                    System.out.println("idnaiu2");
                                 }
                             }
                             i-=1;
@@ -239,7 +250,6 @@ public class Compilatore{
     
     public static void modificaVar(Variabile s, Variabile d) {
     Variabile v = variabili.testa;
-    System.out.println("kads" + Funzioni.converti(s) + " " + Funzioni.converti(d));
     if (v == s) {
         d.next = s.next; // collega il nuovo nodo
         variabili.testa = d;
@@ -247,11 +257,9 @@ public class Compilatore{
     }
 
     while (v != null && v.next != null) {
-        System.out.println("fiesta");
         if (v.next == s) {
             d.next = s.next; // collega il nuovo nodo
             v.next = d;
-            System.out.println("bakq" + Funzioni.converti(s) + " " + Funzioni.converti(d));
             break;
         }
         v = v.next;
@@ -273,7 +281,6 @@ public class Compilatore{
         
         switch(tipo) {
             case 1: // Intero
-                System.out.println("viasd");
                 nuovaVar = new Variabile(nomeVar, tipo, Integer.parseInt(valoreStr));
                 break;
             case 2: // Float
@@ -285,9 +292,7 @@ public class Compilatore{
                 } else {
                     double risultato = Funzioni_calc.main(valoreStr, riga);
                     tipo = (risultato == (int) risultato) ? 1 : 2;
-                    System.out.println("tipo vaar  " + tipo + (int) risultato);
                     nuovaVar = new Variabile(nomeVar, tipo, (tipo == 1) ? (int) risultato : risultato);
-                    System.out.println("vuad" + nuovaVar.tipo + " " + nuovaVar.tipo + " " + nuovaVar.val1 + " " + nuovaVar.val2);
                 }
                 break;
             default:
@@ -299,9 +304,6 @@ public class Compilatore{
             variabili.push(nuovaVar);
         else{
             modificaVar(getVar(nomeVar), nuovaVar);
-            System.out.println("quo");
-            System.out.println(getVar(nomeVar).nome + " " + getVar(nomeVar).tipo + " " + getVar(nomeVar).val1);
-            System.out.println("asdasd");
         }
     }
     

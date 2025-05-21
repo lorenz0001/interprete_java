@@ -23,4 +23,15 @@ public class Variabile{
         tipo = t;
         val3 = val;
     }
+    public String getStringa(){
+        switch(tipo){
+            case 1:
+                return ""+val1;
+            case 2:
+                return ""+val2;
+            case 3:
+                return val3;
+        }
+        return null;
+    }
 }
