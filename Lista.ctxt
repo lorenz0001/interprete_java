@@ -1,7 +1,11 @@
 #BlueJ class context
 comment0.target=Lista
-comment1.params=c\ riga
-comment1.target=void\ add(java.lang.String,\ int)
-comment2.params=
-comment2.target=Op\ rimuovi()
-numComments=3
+comment1.params=s
+comment1.target=boolean\ isOpe(java.lang.String)
+comment2.params=c\ riga
+comment2.target=void\ add(java.lang.String,\ int)
+comment3.params=
+comment3.target=Op\ rimuovi()
+comment4.params=
+comment4.target=void\ stampaLista()
+numComments=5

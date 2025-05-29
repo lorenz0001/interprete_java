@@ -143,9 +143,10 @@ public class Compilatore{
                             }
                             Funzioni.printOut(stringa);
                         }else{
-                            String str = Funzioni.converti(getVar(param));
-                            if(str == null)
+                            v = getVar(param);
+                            if(v == null)
                                 ElevaErr(i+1, 0, "La variabile " + param + " non esiste");
+                            String str = Funzioni.converti(v);
                             Funzioni.printOut(Funzioni.modificaString(str, '#', ' '));
                         }
                         break;

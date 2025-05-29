@@ -2,8 +2,12 @@
 comment0.target=Variabile
 comment1.params=n\ t\ val
 comment1.target=Variabile(java.lang.String,\ int,\ int)
-comment2.params=n\ t\ val
-comment2.target=Variabile(java.lang.String,\ int,\ double)
+comment2.params=n\ t\ val\ q
+comment2.target=Variabile(java.lang.String,\ int,\ double,\ int)
 comment3.params=n\ t\ val
-comment3.target=Variabile(java.lang.String,\ int,\ java.lang.String)
-numComments=4
+comment3.target=Variabile(java.lang.String,\ int,\ double)
+comment4.params=n\ t\ val
+comment4.target=Variabile(java.lang.String,\ int,\ java.lang.String)
+comment5.params=
+comment5.target=java.lang.String\ getStringa()
+numComments=6
