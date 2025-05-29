@@ -83,7 +83,7 @@ public class Compilatore{
                             ElevaErr(i+1, 0, "Sintassi input sbagliata");
                         if(getVar(tokens[1]) == null)
                             ElevaErr(i+1, 0, "Variabile non dichiarata");
-                        String in = JOptionPane.showInputDialog(null, tokens[2]);
+                        String in = JOptionPane.showInputDialog(null, Funzioni.modificaString(tokens[2], '#', ' '));
                         if (in == null) {
                             modificaVar(getVar(tokens[1]), new Variabile(tokens[1],3,"null"));
                         } else {
