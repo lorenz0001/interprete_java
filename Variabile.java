@@ -10,6 +10,11 @@ public class Variabile{
         tipo = t;
         val1 = val;
     }
+    Variabile(String n, int t, double val, int q){
+        nome = n;
+        tipo = t;
+        val2 = val;
+    }
     Variabile(String n, int t, double val){
         nome = n;
         tipo = t;

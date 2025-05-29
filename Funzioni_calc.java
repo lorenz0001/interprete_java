@@ -1,6 +1,6 @@
 public class Funzioni_calc{
     static String[] oper = {
-        "+","-","*","/","%"
+        "+","-","*","/","%","(",")"
     };
     public static boolean isNumero(String t){
         try{
@@ -68,6 +68,8 @@ public static void gestisciOperatori(Op op2, Op op1, Op ope) {
             if(espressione.charAt(i) != ' ')
                 lista.add(""+espressione.charAt(i), riga);
         }
+        lista.stampaLista();
+        System.out.println("riga ");
         return calcola(lista, operatori, operandi, riga);
     }
     
@@ -84,10 +86,10 @@ public static void gestisciOperatori(Op op2, Op op1, Op ope) {
             if(!Compilatore.controlloSintattico(corrente.s, oper) && !isNumero(corrente.s)){
                 Variabile v = Compilatore.getVar(corrente.s);
                 if(v == null){
-                    Compilatore.ElevaErr(riga,0,"Variabile: " + corrente.s + " non dichiarata");
+                    Compilatore.ElevaErr(riga+1,0,"Variabile: " + corrente.s + " non dichiarata");
                 }
                 if(v.tipo == 3)
-                    Compilatore.ElevaErr(riga,0,"Variabile: " + corrente.s + " non compatibile con i calcoli");
+                    Compilatore.ElevaErr(riga+1,0,"Variabile: " + corrente.s + " non compatibile con i calcoli");
                 corrente.s = Funzioni.converti(v);
             }
 

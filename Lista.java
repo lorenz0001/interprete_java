@@ -2,6 +2,18 @@ public class Lista {
     public Op testa = null;
     public Op coda = null;
 
+    static String[] oper = {
+        "+","-","*","/","%","(",")"
+    };
+    
+    public boolean isOpe(String s){
+        for(int i=0;i<oper.length;i++){
+            if(s.equals(oper[i]))
+                return true;
+        }
+        return false;
+    }
+    
     public void add(String c, int riga) throws Err{
         if(coda != null){
             if(c.equals(".") && !Funzioni_calc.isNumero(coda.s)){
@@ -9,7 +21,9 @@ public class Lista {
             }
             
         }
-        
+        if(coda != null && !isOpe(c) && !c.equals(".") && !isOpe(coda.s)){
+            coda.s += c;
+        } else 
         if (coda != null && (
                 (c.equals(".") && Funzioni_calc.isNumero(coda.s)) ||
                 Funzioni_calc.isNumero(c) && (coda.s.charAt(coda.s.length() - 1) == '.' ||
@@ -42,5 +56,13 @@ public class Lista {
             testa.prec = null;
         }
         return tmp;
+    }
+    
+    public void stampaLista(){
+        Op t = testa;
+        while(t != null){
+            System.out.println("njsfnfsd " + testa.s);
+            t = t.next;
+        }
     }
 }

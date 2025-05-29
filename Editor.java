@@ -1,13 +1,20 @@
+ 
+
 import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
 public class Editor {
+    static File f;
+
     public static class Gestisci implements ActionListener {
         JTextArea input;
         JTextArea err;
         JTextArea out;
+        JFileChooser fileChooser;
+        int risultato;
 
         Gestisci(JTextArea input, JTextArea err, JTextArea out) {
             this.input = input;
@@ -15,10 +22,60 @@ public class Editor {
             this.out = out;
         }
 
+        public void salva(String contenuto, boolean salvaCon) {
+            if (salvaCon || f == null) {
+                fileChooser = new JFileChooser();
+                risultato = fileChooser.showSaveDialog(null);
+                if (risultato == JFileChooser.APPROVE_OPTION) {
+                    f = fileChooser.getSelectedFile();
+                } else {
+                    return; // operazione annullata
+                }
+            }
+
+            try (FileWriter writer = new FileWriter(f)) {
+                writer.write(contenuto);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Errore nel salvataggio:\n" + ex.getMessage());
+            }
+        }
+
         public void actionPerformed(ActionEvent e) {
-            err.setText("");
-            out.setText("");
-            Compilatore.compila(input.getText(), err, out, "");
+            String azione = e.getActionCommand();
+
+            switch (azione) {
+                case "Esegui compilazione":
+                    err.setText("");
+                    out.setText("");
+                    Compilatore.compila(input.getText(), err, out, "");
+                    break;
+
+                case "Salva":
+                    salva(input.getText(), false);
+                    break;
+
+                case "Salva con nome":
+                    salva(input.getText(), true);
+                    break;
+
+                case "Apri":
+                    fileChooser = new JFileChooser();
+                    risultato = fileChooser.showOpenDialog(null);
+                    if (risultato == JFileChooser.APPROVE_OPTION) {
+                        f = fileChooser.getSelectedFile();
+                        try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
+                            StringBuilder sb = new StringBuilder();
+                            String linea;
+                            while ((linea = reader.readLine()) != null) {
+                                sb.append(linea).append("\n");
+                            }
+                            input.setText(sb.toString());
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(null, "Errore nell'apertura:\n" + ex.getMessage());
+                        }
+                    }
+                    break;
+            }
         }
     }
 
@@ -79,14 +136,29 @@ public class Editor {
 
         // Menu
         JMenuBar menuBar = new JMenuBar();
-
+        JMenu menuFile = new JMenu("File");
         JMenu menuCompila = new JMenu("Compila");
-        JMenuItem voce = new JMenuItem("Esegui compilazione");
-        voce.addActionListener(new Gestisci(areaCodice, areaErr, areaOut));
-        menuCompila.add(voce);
+
+        JMenuItem apri = new JMenuItem("Apri");
+        JMenuItem salva = new JMenuItem("Salva");
+        JMenuItem salvaCon = new JMenuItem("Salva con nome");
+        JMenuItem compila = new JMenuItem("Esegui compilazione");
+
+        Gestisci gestore = new Gestisci(areaCodice, areaErr, areaOut);
+
+        apri.addActionListener(gestore);
+        salva.addActionListener(gestore);
+        salvaCon.addActionListener(gestore);
+        compila.addActionListener(gestore);
+
+        menuFile.add(apri);
+        menuFile.add(salva);
+        menuFile.add(salvaCon);
+        menuCompila.add(compila);
+        menuBar.add(menuFile);
         menuBar.add(menuCompila);
 
-        // Font selector (senza generics)
+        // Font selector
         Integer[] dimensioniFont = {10, 12, 14, 16, 18, 20, 24, 28, 32};
         JComboBox selettoreFont = new JComboBox(dimensioniFont);
         selettoreFont.setSelectedItem(32);
@@ -105,7 +177,7 @@ public class Editor {
         menuBar.add(new JLabel(" Font: "));
         menuBar.add(selettoreFont);
 
-        // Area inferiore con errori e output affiancati
+        // Area inferiore: output + errori (niente barra input)
         JPanel areaBassa = new JPanel(new GridLayout(1, 2));
         areaBassa.add(scrollErr);
         areaBassa.add(scrollOut);

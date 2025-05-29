@@ -1,5 +1,6 @@
 import java.io.*;
 import javax.swing.JTextArea;
+import javax.swing.*;
 
 public class Compilatore{
     static String alfabeto = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.+-*/=!&;:()[]_<>%"+'\t'+'"';
@@ -48,16 +49,6 @@ public class Compilatore{
     }
     
     
-    public static String getCodice(String s) throws Err{
-        /*INIZIO
-         * 
-         * FINE*/
-        int inizio = s.indexOf("INIZIO") + "INIZIO".length();
-        int fine = s.indexOf("END");
-        return s.substring(inizio, fine);
-    }
-    
-    
     public static void compila(String s, JTextArea errAreas, JTextArea outAreas, String outStrings){
         variabili = new ListaVar();
         int livello_corrente = 0;
@@ -71,6 +62,7 @@ public class Compilatore{
             String[] righe = s.replace("\n","").split(";");
             //controlloErrori(righe);
             Funzioni.trasformaElse(righe);
+            //ElevaErr(0,0,String.join(" ", righe));
             for(int i=0;i<righe.length;i++){
                 livello = Funzioni.getLivello(righe[i]);
                 //System.out.println("livello: " + Funzioni.getLivello(righe[i]));
@@ -86,14 +78,34 @@ public class Compilatore{
                 if(righe[i].startsWith("//"))
                     continue;
                 switch(tokens[0]){
+                    case "input":
+                        if(tokens.length != 3)
+                            ElevaErr(i+1, 0, "Sintassi input sbagliata");
+                        if(getVar(tokens[1]) == null)
+                            ElevaErr(i+1, 0, "Variabile non dichiarata");
+                        String in = JOptionPane.showInputDialog(null, tokens[2]);
+                        if (in == null) {
+                            modificaVar(getVar(tokens[1]), new Variabile(tokens[1],3,"null"));
+                        } else {
+                            int tipo = Funzioni.getTipo(in);
+                            switch(tipo){
+                                case 1:
+                                    modificaVar(getVar(tokens[1]), new Variabile(tokens[1],1,Integer.parseInt(in)));
+                                    break;
+                                case 2:
+                                    modificaVar(getVar(tokens[1]), new Variabile(tokens[1],2,Double.parseDouble(in)));
+                                    break;
+                                case 3:
+                                    modificaVar(getVar(tokens[1]), new Variabile(tokens[1],3,in));
+                                    break;
+                            }
+                            
+                        }
+                        break;
                     case "let":
                         if(getVar(tokens[1]) != null)
                             ElevaErr(i+1, 0, "Variabile già dichiarata: " + tokens[1]);
                         dichiara(tokens, i, righe[i], 0);
-                        String[] nuovoDizionario = new String[dizionario.length + 1];
-                        System.arraycopy(dizionario, 0, nuovoDizionario, 0, dizionario.length);
-                        nuovoDizionario[dizionario.length] = tokens[1];
-                        dizionario = nuovoDizionario;
                         break;
                     case "print":
                         String param = tokens[1];
@@ -153,12 +165,13 @@ public class Compilatore{
                         Variabile v1, v2;
                         v1 = creaVar(tokens[1]);
                         v2 = creaVar(tokens[3]);
-                        //System.out.println("v2 " + tokens[3]);
-                        String ope = tokens[2];
-                        //System.out.println("tipo1: "+ v1.tipo + ", tipo2: " + v2.tipo);
+                        System.out.println("V1: " + v1.val2 + " " + v1.tipo + " V2: " + v2.val2 + " " + v2.tipo);
                         
-                        if(v1.tipo != v2.tipo)
+                        String ope = tokens[2];
+                        
+                        if(v1.tipo != v2.tipo){
                             ElevaErr(i+1, 0, "I tipi dei dati da confrontare devono essere gli stessi");
+                        }
                         
                         switch(ope){
                             case ">":
@@ -209,6 +222,7 @@ public class Compilatore{
                        
                         break;
                     default:
+                        System.out.println("NON RICONOSC " + tokens[0]);
                         if((v = getVar(tokens[0])) != null){
                             dichiara(tokens, i, righe[i], 1);
                         } else
@@ -227,14 +241,21 @@ public class Compilatore{
             int tipo = Funzioni.getTipo(s);
             switch(tipo){
                 case 1:
-                    return new Variabile("",tipo,Integer.parseInt(s));
                 case 2:
-                    return new Variabile("",tipo,Double.parseDouble(s));
+                    return new Variabile("",2,Double.parseDouble(s),1);
                 case 3:
                     return new Variabile("",tipo,s);
             }
-        }else
-            return v;
+        }else{
+            switch(v.tipo){
+                case 1:
+                    return new Variabile("",2,Double.parseDouble(""+v.val1),1);
+                case 2:
+                    return new Variabile("",2,v.val2,1);
+                case 3:
+                    return v;
+            }
+        }
         return null;
     }
     public static Variabile getVar(String s){
@@ -268,6 +289,10 @@ public class Compilatore{
 
     
     public static void dichiara(String[] tokens, int riga, String r, int q) throws Err{
+        if(tokens.length == 2){
+            variabili.push(new Variabile(tokens[1],1,0));
+            return;
+        }
         if(tokens.length < 4 - q || !tokens[2 - q].equals("=")) {
             ElevaErr(riga + 1, 0, "Dichiarazione non valida");
             return;
@@ -306,15 +331,4 @@ public class Compilatore{
             modificaVar(getVar(nomeVar), nuovaVar);
         }
     }
-    
-    /*public static void compila() throws IOException{
-        FileReader f = new FileReader("./codice.wow7");
-        BufferedReader r = new BufferedReader(f);
-        String codice = "";
-        String riga;
-        while((riga = r.readLine()) != null){
-            codice += riga + "\n";
-        }
-        controlloErrori(codice);
-    }*/
 }
